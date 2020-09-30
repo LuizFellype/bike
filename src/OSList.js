@@ -29,7 +29,7 @@ export const OSList = (props) => {
           </span>
         </div>
 
-        {props.onPrint && <Button onClick={props.onPrint} label="Print OS para enviar" className="p-button-outlined p-button-secondary p-ml-2" />}
+        {props.onPrint && <Button onClick={props.onPrint} label="Print OS para enviar" className="p-button-outlined p-button-primary p-button-rounded p-ml-2" icon="pi pi-copy" />}
       </div>
       {
         !!data && data.length ?
