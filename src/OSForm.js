@@ -51,15 +51,13 @@ const OSForm = props => {
             date: !!date ? new Date(date).getTime() : new Date().getTime()
         }
 
-        console.log('Values', formValues)
-     
         isUpdating ? props.onSubmit(formValues, props.selected.id) : props.onSubmit(formValues)
     }
     return (
         <Card >
             {
                 props.selected && <div className='p-d-flex p-jc-end'>
-                    <span><bold>Editando OS:</bold> {isUpdating && props.selected.date}</span>
+                    <span><b>OS:</b> {isUpdating && props.selected.date}</span>
                 </div>
             }
             <form id="react-no-print" onSubmit={handleForm}>
@@ -83,7 +81,7 @@ const OSForm = props => {
                         </div>
                         <div className="p-field p-col-6 p-md-4">
                             <label htmlFor="color">Cor predominante</label>
-                            <InputText id="color" type="text" placeholder="ex.: Preta" ref={colorRef} />
+                            <InputText id="color" type="text" ref={colorRef} />
                         </div>
                         <div className="p-field p-col-6 p-md-4">
                             <label htmlFor="value">Valor</label>
@@ -92,7 +90,7 @@ const OSForm = props => {
                                     <span>R$</span>
                                 </span>
                                 <span className="p-float-label">
-                                    <InputNumber id="value" placeholder="130,50" mode="decimal" minFractionDigits={2} maxFractionDigits={2} ref={valueRef} />
+                                    <InputNumber id="value" mode="decimal" minFractionDigits={2} maxFractionDigits={2} ref={valueRef} />
                                     <label htmlFor="inputgroup" />
                                 </span>
                             </div>

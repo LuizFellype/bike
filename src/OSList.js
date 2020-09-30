@@ -3,6 +3,7 @@ import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { Message } from 'primereact/message';
 import React from 'react';
+import { Button } from 'primereact/button';
 import { getAllByOSOrPhone } from './services/client';
 
 export const OSList = (props) => {
@@ -17,17 +18,21 @@ export const OSList = (props) => {
   }
 
   return (
-    <div className='p-d-flex p-pt-4 p-flex-column'>
-      <div className="p-d-flex p-flex-column p-as-end p-pb-4">
-        <label htmlFor="search">OS ou Telefone</label>
-        <span className="p-input-icon-left">
-          <i className="pi pi-search" />
-          <InputText placeholder="Search" id='search' ref={searchRef} tooltip="Digite e aperte enter para filtrar" tooltipOptions={{position: 'bottom'}} onKeyDown={handleKeyDown} />
-        </span>
-      </div>
+    <div className='p-d-flex p-flex-column'>
 
+      <div className='p-d-flex p-jc-end p-py-3 p-ai-end'>
+        <div className="p-d-flex p-flex-column p-as-end">
+          <label htmlFor="search">OS ou Telefone</label>
+          <span className="p-input-icon-left">
+            <i className="pi pi-search" />
+            <InputText placeholder="Search" id='search' ref={searchRef} tooltip="Digite e aperte enter para filtrar" tooltipOptions={{ position: 'bottom' }} onKeyDown={handleKeyDown} />
+          </span>
+        </div>
+
+        {props.onPrint && <Button onClick={props.onPrint} label="Print OS para enviar" className="p-button-outlined p-button-secondary p-ml-2" />}
+      </div>
       {
-        !!data ?
+        !!data && data.length ?
           <div className="card">
             {/* <DataTable value={data} selection={selected} onSelectionChange={e => this.setState({ selectedProduct1: e.value })} selectionMode="single"> */}
             <DataTable value={data} onSelectionChange={e => props.onOSSelect(e.value)} selectionMode="single">
