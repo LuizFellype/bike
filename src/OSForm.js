@@ -96,9 +96,9 @@ const OSForm = props => {
                             </div>
                         </div>
                     </div>
-                    <div className='p-d-flex p-d-flex p-jc-end'>
-                        <Button label='Cancelar' onClick={props.onCancel} className="p-button-outlined p-button-secondary" />
-                        <Button type='submit' label={isUpdating ? 'Atualizar' : 'Salvar'} className="p-button-success p-ml-2" />
+                    <div className='p-d-flex p-d-flex p-jc-end hide-on-print'>
+                        <Button label='Cancelar' onClick={props.onCancel} className="p-button-outlined p-button-secondary hide-on-print" />
+                        <Button type='submit' label={isUpdating ? 'Atualizar' : 'Salvar'} className="p-button-success p-ml-2 hide-on-print" />
                     </div >
                 </div >
             </form>
