@@ -54,7 +54,7 @@ const OSForm = props => {
         isUpdating ? props.onSubmit(formValues, props.selected.id) : props.onSubmit(formValues)
     }
     return (
-        <Card >
+        <Card>
             {
                 props.selected && <div className='p-d-flex p-jc-end'>
                     <span><b>OS:</b> {isUpdating && props.selected.date}</span>
