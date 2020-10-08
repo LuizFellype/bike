@@ -36,7 +36,7 @@ export const OSList = (props) => {
           <div className="card">
             {/* <DataTable value={data} selection={selected} onSelectionChange={e => this.setState({ selectedProduct1: e.value })} selectionMode="single"> */}
             <DataTable value={data} onSelectionChange={e => props.onOSSelect(e.value)} selectionMode="single">
-              <Column field="date" header="OS"></Column>
+              <Column field="osNumber" header="OS"></Column>
               <Column field="name" header="Nome"></Column>
               <Column field="phone" header="Telefone"></Column>
             </DataTable>

@@ -57,7 +57,7 @@ const OSForm = props => {
             date: !!date ? new Date(date).getTime() : new Date().getTime()
         }
         
-        isUpdating ? props.onSubmit(formValues, props.selected.id) : props.onSubmit(formValues)
+        isUpdating ? props.onSubmit({...props.selected, ...formValues}, props.selected.id) : props.onSubmit(formValues)
     }
 
     const handleAddService = () => {
@@ -74,7 +74,7 @@ const OSForm = props => {
         <Card>
             {
                 props.selected && <div className='p-d-flex p-jc-end'>
-                    <span><b>OS:</b> {isUpdating && props.selected.date}</span>
+                    <span><b>OS:</b> {isUpdating && props.selected.osNumber}</span>
                 </div>
             }
             <form id="react-no-print" onSubmit={handleForm}>

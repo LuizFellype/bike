@@ -1,12 +1,14 @@
 import React from 'react';
 import { printComponent } from "react-print-tool"
 import OSForm from './OSForm';
-import { createOS, updateOSById } from './services/client';
+import { createOS, updateOSById, getOsLastNumber, setOsLastNumber } from './services/client';
 import { Toast } from 'primereact/toast';
 
 import './App.css';
 import { OSList } from './OSList';
-
+import { CONSTS } from './helpers/constants';
+import { getCookie, setCookie } from './helpers/cookies';
+const { STORAGE } = CONSTS
 const ComponentToBePrinted = (props) => {
   return <div>
     <h1 className="p-text-center">Bicicletaria</h1>
@@ -17,19 +19,25 @@ const ComponentToBePrinted = (props) => {
 
 function App() {
   const [selected, setSelected] = React.useState()
+  const [lastOsNumber, setLastOsNumber] = React.useState()
   const toastRef = React.useRef()
 
   const print = () => printComponent(<ComponentToBePrinted selected={selected} onSubmit={handleSubmit} onCancel={() => setSelected(undefined)} onPrint={print} />)
 
   const handleSubmit = async (data, osId) => {
     let item = {}
+    
     try {
       if (!!osId) {
         item = await updateOSById(data, osId)
       } else {
-        item = await createOS(data)
+        const nextNumber = lastOsNumber + 1
+        item = await createOS({ ...data, osNumber: nextNumber })
+        setOsLastNumber(nextNumber)
+        setCookie(STORAGE.lastOsNumber, nextNumber, STORAGE.expiresIn)
+        setLastOsNumber(nextNumber)
       }
-      toastRef.current.show({ severity: 'success', summary: 'Sucesso !!!', detail: `OS ${item.date} criada/atualizada com sucesso.` })
+      toastRef.current.show({ severity: 'success', summary: 'Sucesso !!!', detail: `OS ${item.osNumber} criada/atualizada com sucesso.` })
       setSelected(item)
     } catch (err) {
       console.log('ERROR: ', err)
@@ -40,6 +48,31 @@ function App() {
       })
     }
   }
+
+  React.useEffect(() => {
+    const checkForLastOsNumber = async () => {
+      let osNumber = getCookie(STORAGE.lastOsNumber)
+      if (!osNumber) {
+        try {
+          const lastNumber = await getOsLastNumber()
+          setCookie(STORAGE.lastOsNumber, lastNumber, STORAGE.expiresIn)
+          
+          osNumber = lastNumber
+        } catch (err) {
+          console.log('ERROR: ', err)
+          toastRef.current.show({
+            severity: 'error',
+            summary: 'Error ineserapdo !!',
+            detail: 'Não foi possivel identificar qual o proximo número de OS por favor recarregue a pagina ou contate o suporte.'
+          })
+        }
+      }
+
+      setLastOsNumber(Number(osNumber))
+    }
+
+    checkForLastOsNumber()
+  }, [])
 
   return (
     <>
