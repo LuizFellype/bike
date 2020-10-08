@@ -56,7 +56,7 @@ const OSForm = props => {
             value: valueRef.current.inputEl.value,
             date: !!date ? new Date(date).getTime() : new Date().getTime()
         }
-
+        
         isUpdating ? props.onSubmit(formValues, props.selected.id) : props.onSubmit(formValues)
     }
 
@@ -116,7 +116,7 @@ const OSForm = props => {
                                     </div>
                                 })
                             }
-                            <div className="p-d-flex">
+                            <div className="p-d-flex hide-on-print">
                                 <InputTextarea id="services" type="text" rows="2" placeholder="ex.: Revisão geral, Pedal e Pastilhas." ref={servicesRef} />
                                 <div className="p-inputgroup p-ml-2 mw-200">
                                     <span className="p-inputgroup-addon">
@@ -137,7 +137,6 @@ const OSForm = props => {
                         <div className="p-field p-col-6 p-md-4">
                             <label htmlFor="color">Cor predominante</label>
                             <InputText id="color" type="text" ref={colorRef} />
-
                         </div>
 
                         <div className="p-field p-col-6 p-md-4 p-text-center" style={{ fontSize: '1.25rem' }}>
@@ -146,7 +145,7 @@ const OSForm = props => {
                         </div>
                     </div>
                     <div className='p-d-flex p-d-flex p-jc-end hide-on-print'>
-                        <Button label='Cancelar' onClick={props.onCancel} className="p-button-outlined p-button-secondary hide-on-print" />
+                        <Button label='Cancelar' onClick={props.onCancel} type='button' className="p-button-outlined p-button-secondary hide-on-print" />
                         <Button type='submit' label={isUpdating ? 'Atualizar' : 'Salvar'} className="p-button-success p-ml-2 hide-on-print" />
                     </div >
                 </div >

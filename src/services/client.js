@@ -8,6 +8,13 @@ export const createOS = async (dataToAdd) => {
     return { ...dataToAdd, id: res.id }
 }
 
+export const updateOSById = async ({ id, ...dataToUpdate }, osId) => {
+    const dataNormalized = normalizeOS(true)(dataToUpdate)
+    await FBDatabase.collection('os').doc(osId).update(dataNormalized)
+
+    return { ...dataToUpdate, id: osId }
+}
+
 // const fake = {
 //     name: 'NOME',
 //     phone: '98852-1801',
@@ -19,7 +26,7 @@ export const createOS = async (dataToAdd) => {
 
 export const getAllByOSOrPhone = async (OSOrPhone) => {
     let data = []
-    
+
     const snapshotByDate = await FBDatabase.collection('os')
         .where('date', '==', Number(OSOrPhone))
         .get()
@@ -38,7 +45,7 @@ export const getAllByOSOrPhone = async (OSOrPhone) => {
     const pushToData = (doc) => {
         data = [...data, normalizeOS(false)({ ...doc.data(), id: doc.id })]
     }
-    
+
     snapshotByDate.forEach(pushToData)
     snapshot.forEach(pushToData)
 

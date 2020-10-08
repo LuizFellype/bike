@@ -1,7 +1,7 @@
 import React from 'react';
 import { printComponent } from "react-print-tool"
 import OSForm from './OSForm';
-import { createOS } from './services/client';
+import { createOS, updateOSById } from './services/client';
 import { Toast } from 'primereact/toast';
 
 import './App.css';
@@ -21,12 +21,18 @@ function App() {
 
   const print = () => printComponent(<ComponentToBePrinted selected={selected} onSubmit={handleSubmit} onCancel={() => setSelected(undefined)} onPrint={print} />)
 
-  const handleSubmit = async (data) => {
+  const handleSubmit = async (data, osId) => {
+    let item = {}
     try {
-      const itemAdded = await createOS(data)
-      toastRef.current.show({ severity: 'success', summary: 'Sucesso !!!', detail: `OS ${itemAdded.date} criada com sucesso.` })
-      setSelected(itemAdded)
+      if (!!osId) {
+        item = await updateOSById(data, osId)
+      } else {
+        item = await createOS(data)
+      }
+      toastRef.current.show({ severity: 'success', summary: 'Sucesso !!!', detail: `OS ${item.date} criada/atualizada com sucesso.` })
+      setSelected(item)
     } catch (err) {
+      console.log('ERROR: ', err)
       toastRef.current.show({
         severity: 'error',
         summary: 'Error ao salvar !!',
