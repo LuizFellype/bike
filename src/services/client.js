@@ -1,5 +1,5 @@
 import { FBDatabase } from "../firebaseConfig"
-import { normalizeOS } from "../helpers/normalizePhone"
+import { normalizeOS } from "../helpers/normalizeOS"
 
 export const createOS = async (dataToAdd) => {
     const dataNormalized = normalizeOS(true)(dataToAdd)
@@ -11,7 +11,7 @@ export const createOS = async (dataToAdd) => {
 // const fake = {
 //     name: 'NOME',
 //     phone: '98852-1801',
-//     services: 'PASTILHAS',
+//     services: [{ service: 'Revisão geral', value: '130,00' }],
 //     color: 'PRETA',
 //     value: '10',
 //     date: new Date().getTime()
