@@ -93,7 +93,7 @@ const OSForm = props => {
                             {
                                 services.map(({ service, value }, idx) => {
                                     return <div className='p-d-flex p-mb-1' key={idx}>
-                                        <InputTextarea id="services" type="text" rows="2" placeholder="ex.: Revisão geral, Pedal e Pastilhas." value={service} onChange={(e) => {
+                                        <InputTextarea id="services" type="text" rows="2" autoResize placeholder="ex.: Revisão geral, Pedal e Pastilhas." value={service} onChange={(e) => {
                                             const valuesUpdated = updateItembyIndex(idx, services, { service: e.currentTarget.value, value })
                                             console.log({idx, valuesUpdated, e})
                                             setServices(valuesUpdated)
@@ -107,7 +107,7 @@ const OSForm = props => {
                                                 <InputNumber id="value" mode="decimal" minFractionDigits={2} maxFractionDigits={2} value={normalizeCurrency(value)} onChange={(e) => {
                                                     const value = normalizeCurrency(e.value, true)
                                                     const valuesUpdated = updateItembyIndex(idx, services, { service, value })
-                                                    console.log('value --', `${value}`)
+                                                    // console.log('value --', `${value}`)
                                                     setServices(valuesUpdated)
                                                 }} />
                                                 <label htmlFor="inputgroup" />
@@ -117,7 +117,7 @@ const OSForm = props => {
                                 })
                             }
                             <div className="p-d-flex hide-on-print">
-                                <InputTextarea id="services" type="text" rows="2" placeholder="ex.: Revisão geral, Pedal e Pastilhas." ref={servicesRef} />
+                                <InputTextarea id="services" type="text" rows="2" autoResize placeholder="ex.: Revisão geral, Pedal e Pastilhas." ref={servicesRef} />
                                 <div className="p-inputgroup p-ml-2 mw-200">
                                     <span className="p-inputgroup-addon">
                                         <span>R$</span>

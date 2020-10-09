@@ -26,7 +26,7 @@ function App() {
 
   const handleSubmit = async (data, osId) => {
     let item = {}
-    
+
     try {
       if (!!osId) {
         item = await updateOSById(data, osId)
@@ -34,8 +34,6 @@ function App() {
         const nextNumber = lastOsNumber + 1
         item = await createOS({ ...data, osNumber: nextNumber })
         setOsLastNumber(nextNumber)
-        setCookie(STORAGE.lastOsNumber, nextNumber, STORAGE.expiresIn)
-        setLastOsNumber(nextNumber)
       }
       toastRef.current.show({ severity: 'success', summary: 'Sucesso !!!', detail: `OS ${item.osNumber} criada/atualizada com sucesso.` })
       setSelected(item)
@@ -51,24 +49,17 @@ function App() {
 
   React.useEffect(() => {
     const checkForLastOsNumber = async () => {
-      let osNumber = getCookie(STORAGE.lastOsNumber)
-      if (!osNumber) {
-        try {
-          const lastNumber = await getOsLastNumber()
-          setCookie(STORAGE.lastOsNumber, lastNumber, STORAGE.expiresIn)
-          
-          osNumber = lastNumber
-        } catch (err) {
-          console.log('ERROR: ', err)
-          toastRef.current.show({
-            severity: 'error',
-            summary: 'Error ineserapdo !!',
-            detail: 'Não foi possivel identificar qual o proximo número de OS por favor recarregue a pagina ou contate o suporte.'
-          })
-        }
+      try {
+        const lastNumber = await getOsLastNumber()
+        setLastOsNumber(Number(lastNumber))
+      } catch (err) {
+        console.log('ERROR: ', err)
+        toastRef.current.show({
+          severity: 'error',
+          summary: 'Error ineserapdo !!',
+          detail: 'Não foi possivel identificar qual o proximo número de OS por favor recarregue a pagina ou contate o suporte.'
+        })
       }
-
-      setLastOsNumber(Number(osNumber))
     }
 
     checkForLastOsNumber()
