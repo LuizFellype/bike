@@ -135,7 +135,7 @@ const OSForm = props => {
                             <Calendar id="date" showIcon value={date} onChange={e => setDate(e.value)} dateFormat='dd/mm/yy' />
                         </div>
                         <div className="p-field p-col-6 p-md-4">
-                            <label htmlFor="color">Cor predominante</label>
+                            <label htmlFor="color">Marca/Modelo/Cor</label>
                             <InputText id="color" type="text" ref={colorRef} />
                         </div>
 
