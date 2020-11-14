@@ -1,28 +1,39 @@
 import React from 'react'
-import { BrowserRouter, Switch, Route, Redirect } from "react-router-dom"
-import { createBrowserHistory } from "history"
+import { HashRouter as DomRouter, Switch, Route, Redirect } from "react-router-dom"
+import { createHashHistory } from "history"
 
 import OsPage from './pages/OS'
 import { ToastContextProvider } from './hooks/ToastContext'
 import Authentication from './components/Authentication'
 
-const customHistory = createBrowserHistory();
+const customHistory = createHashHistory();
+const PrivateRoute = (props) => {
+    return (
+        <Authentication >
+            <Route {...props} />
+        </Authentication>
+    )
+}
 
 export default function Router() {
     return (
         <>
             <ToastContextProvider>
-                <BrowserRouter history={customHistory}>
-                    <Authentication>
-                        <Switch>
-                            <Route exact path={["/", '/os/:os']} component={OsPage} />
-                            {/* <Route exact path={'/admin'} component={Authentication} />  */}
-                            <Route path="*" >
-                                <Redirect to='/' />
-                            </Route>
-                        </Switch>
-                    </Authentication>
-                </BrowserRouter>
+                <DomRouter history={customHistory}>
+                    <Switch>
+                        <PrivateRoute exact path={['/', '/admin']} component={OsPage} />
+                        {/* <Route  >
+                            <Authentication >
+                                <OsPage />
+                            </Authentication>
+                        </Route> */}
+                        {/* <Route exact path={'/admin'} component={Authentication} /> */}
+                        <Route exact path={'/os/:os'} component={OsPage} />
+                        <Route path="*" >
+                            <Redirect to='/' />
+                        </Route>
+                    </Switch>
+                </DomRouter>
             </ToastContextProvider>
         </>
     );
