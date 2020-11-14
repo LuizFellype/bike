@@ -152,7 +152,7 @@ const OSForm = props => {
 
                     <div className={'p-d-flex p-jc-end hide-on-print'} >
                         {props.selected && <Button label='Compartilhar' onClick={async () => {
-                            const sharableUrl = `${window.location.origin}/os/${props.selected.osNumber}`
+                            const sharableUrl = `${window.location.origin}/#/os/${props.selected.osNumber}`
                             try {
                                 await navigator.share({
                                     title: `OS: ${props.selected.osNumber} - Velo27`,
