@@ -1,4 +1,5 @@
 import { FBDatabase } from "../firebaseConfig"
+import { CONSTS } from "../helpers/constants"
 import { normalizeOS } from "../helpers/normalizeOS"
 
 export const getOsLastNumber = async (numberAdded) => {
@@ -46,31 +47,27 @@ export const updateOSById = async ({ id, ...dataToUpdate }, osId) => {
 //     osNumber: '1',
 //     date: new Date().getTime()
 // }
-
 export const getAllByOSOrPhone = async (OSOrPhone) => {
     let data = []
-
-    const snapshotByDate = await FBDatabase.collection('os')
-        .where('osNumber', '==', Number(OSOrPhone))
-        .get()
-
-    const snapshot = await FBDatabase.collection('os')
-        .where('phone', '==', OSOrPhone)
-        .get()
-
-    if (snapshot.empty && snapshotByDate.empty) {
-        // console.log('No matching documents.');
-        return []
-    }
-
     const pushToData = (doc) => {
         data = [...data, normalizeOS(false)({ ...doc.data(), id: doc.id })]
     }
 
-    snapshotByDate.forEach(pushToData)
-    snapshot.forEach(pushToData)
+    const snapshotByOsNumber = await FBDatabase.collection('os')
+        .where('osNumber', '==', Number(OSOrPhone))
+        .get()
 
-    // console.log('data', data)
 
-    return data.reverse()
+    if (snapshotByOsNumber.empty) {
+        const snapshotByPhone = await FBDatabase.collection('os')
+            .where('phone', '==', OSOrPhone)
+            .get()
+
+        snapshotByPhone.forEach(pushToData)
+        return { data: data.reverse(), type: CONSTS.GENERAL_KEYS.osByKeys.phone }
+    } else {
+        snapshotByOsNumber.forEach(pushToData)
+        return { data: data.reverse(), type: CONSTS.GENERAL_KEYS.osByKeys.osNumber }
+    }
+
 }

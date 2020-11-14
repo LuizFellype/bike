@@ -8,15 +8,15 @@
     "@testing-library/user-event": "^7.1.2",
     "classnames": "^2.2.6",
     "firebase": "^7.21.1",
+    "history": "^5.0.0",
     "primeflex": "^2.0.0",
     "primeicons": "^4.0.0",
     "primereact": "^5.0.0-rc.2",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
     "react-print-components": "^1.0.4",
-    "react-print-tool": "^3.0.0",
+    "react-router-dom": "^5.2.0",
     "react-scripts": "3.4.3",
-    "react-to-print": "^2.10.0",
     "react-transition-group": "^4.4.1"
   },
   "scripts": {

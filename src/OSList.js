@@ -3,24 +3,54 @@ import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { Message } from 'primereact/message';
 import React from 'react';
-import { Button } from 'primereact/button';
+import { withRouter } from "react-router-dom"
+// import { Button } from 'primereact/button';
 import { getAllByOSOrPhone } from './services/client';
+import { useToastContext } from './hooks/ToastContext';
+import { CONSTS } from './helpers/constants';
 
-export const OSList = (props) => {
+export const OSList = withRouter((props) => {
+  const toastRef = useToastContext()
+
   const [data, setData] = React.useState()
   const searchRef = React.useRef()
+  const { os } = props.match.params
 
   const handleKeyDown = async (e) => {
     if (e.keyCode === 13) {
-      const list = await getAllByOSOrPhone(searchRef.current.element.value)
+      const { data: list, type } = await getAllByOSOrPhone(e.customValue || searchRef.current.element.value)
+      console.log({ list, type })
+      if (list.length && type === CONSTS.GENERAL_KEYS.osByKeys.osNumber) {
+        props.onOSSelect(list[0])
+      }
       setData(list)
+      return type
     }
   }
+
+  React.useEffect(() => {
+    const OsIsNotValid = !!os && isNaN(os)
+
+    if (OsIsNotValid) {
+      toastRef.current.show({
+        severity: 'error',
+        summary: 'Numero de OS inválida',
+        detail: `OS pesquisada: "${props.location.pathname}" não é válida.`
+      })
+    } else {
+      handleKeyDown({ customValue: os, keyCode: 13 })
+    }
+    // eslint-disable-next-line
+  }, [os, props.location.pathname, toastRef])
+
+  let msgText = 'Digite no campo acima e clique enter para filtrar.'
+  if ((searchRef.current && searchRef.current.element.value) || (data && !data.length && !!os)) msgText = 'Nenhum dado encontrado.'
+  else if (!data && !!os) msgText = 'Carregando...'
 
   return (
     <div className='p-d-flex p-flex-column'>
 
-      <div className='p-d-flex p-jc-end p-py-3 p-ai-end'>
+      <div className={`${!!os ? 'p-d-none' : 'p-d-flex p-jc-end p-py-3 p-ai-end'}`}>
         <div className="p-d-flex p-flex-column p-as-end">
           <label htmlFor="search">OS ou Telefone</label>
           <span className="p-input-icon-left">
@@ -29,7 +59,7 @@ export const OSList = (props) => {
           </span>
         </div>
 
-        {props.onPrint && <Button onClick={props.onPrint} label="Print OS para enviar" className="p-button-outlined p-button-primary p-button-rounded p-ml-2" icon="pi pi-copy" />}
+        {/* {props.onPrint && <Button onClick={props.onPrint} label="Print OS para enviar" className="p-button-outlined p-button-primary p-button-rounded p-ml-2" icon="pi pi-copy" />} */}
       </div>
       {
         !!data && data.length ?
@@ -40,9 +70,11 @@ export const OSList = (props) => {
               <Column field="name" header="Nome"></Column>
               <Column field="phone" header="Telefone"></Column>
             </DataTable>
-          </div> : <Message severity="info" text={searchRef.current && searchRef.current.element.value ? 'Nenhum dado encontrado.' : 'Digite no campo acima e clique enter para filtrar.'} />
+          </div> : <Message
+            severity="info"
+            text={msgText} />
       }
 
     </div>
   )
-}
+})

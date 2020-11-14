@@ -13,7 +13,7 @@ import { normalizeCurrency, updateItembyIndex } from './helpers/normalizeOS';
 const OSForm = props => {
     const [date, setDate] = React.useState(() => new Date())
     const [phone, setPhone] = React.useState('')
-    const [services, setServices] = React.useState([{ service: 'Revisão geral', value: '130,00' }])
+    const [services, setServices] = React.useState([{ service: 'Revisão geral', value: '150,00' }])
     const nameRef = React.useRef()
     const servicesRef = React.useRef(null)
     const colorRef = React.useRef(null)
@@ -68,13 +68,14 @@ const OSForm = props => {
         servicesRef.current.element.value = ''
         valueRef.current.inputEl.value = ''
     }
-
-
+    
+    if (props.viewOnly && !props.selected) return <></>
+    
     return (
         <Card>
             {
                 props.selected && <div className='p-d-flex p-jc-end'>
-                    <span><b>OS:</b> {isUpdating && props.selected.osNumber}</span>
+                    <span className="p-tag p-tag-rounded">OS SELECIONADA: <b>{isUpdating && props.selected.osNumber}</b></span>
                 </div>
             }
             <form id="react-no-print" onSubmit={handleForm}>
@@ -82,18 +83,18 @@ const OSForm = props => {
                     <div className="p-fluid p-formgrid p-grid">
                         <div className="p-field p-col-12 p-md-6">
                             <label htmlFor="firstname6">Nome</label>
-                            <InputText id="firstname6" type="text" placeholder="ex.: Luiz Fellype" ref={nameRef} required />
+                            <InputText disabled={props.viewOnly} id="firstname6" type="text" placeholder="ex.: Luiz Fellype" ref={nameRef} required />
                         </div>
                         <div className="p-field p-col-12 p-md-6">
                             <label htmlFor="phone">Phone</label>
-                            <InputMask id="phone" mask="99999-9999" placeholder="99999-9999" value={phone} onChange={e => setPhone(e.value)} required />
+                            <InputMask disabled={props.viewOnly} id="phone" mask="99999-9999" placeholder="99999-9999" value={phone} onChange={e => setPhone(e.value)} required />
                         </div>
                         <div className="p-field p-col-12">
                             <label htmlFor="services">Peças / Acessórios / Serviços</label>
                             {
                                 services.map(({ service, value }, idx) => {
                                     return <div className='p-d-flex p-mb-1' key={idx}>
-                                        <InputTextarea id="services" type="text" rows="2" autoResize placeholder="ex.: Revisão geral, Pedal e Pastilhas." value={service} onChange={(e) => {
+                                        <InputTextarea disabled={props.viewOnly} id="services" type="text" rows="2" autoResize placeholder="ex.: Revisão geral, Pedal e Pastilhas." value={service} onChange={(e) => {
                                             const valuesUpdated = updateItembyIndex(idx, services, { service: e.currentTarget.value, value })
                                             console.log({idx, valuesUpdated, e})
                                             setServices(valuesUpdated)
@@ -104,7 +105,7 @@ const OSForm = props => {
                                                 <span>R$</span>
                                             </span>
                                             <span className="p-float-label">
-                                                <InputNumber id="value" mode="decimal" minFractionDigits={2} maxFractionDigits={2} value={normalizeCurrency(value)} onChange={(e) => {
+                                                <InputNumber disabled={props.viewOnly} id="value" mode="decimal" minFractionDigits={2} maxFractionDigits={2} value={normalizeCurrency(value)} onChange={(e) => {
                                                     const value = normalizeCurrency(e.value, true)
                                                     const valuesUpdated = updateItembyIndex(idx, services, { service, value })
                                                     // console.log('value --', `${value}`)
@@ -116,14 +117,14 @@ const OSForm = props => {
                                     </div>
                                 })
                             }
-                            <div className="p-d-flex hide-on-print">
-                                <InputTextarea id="services" type="text" rows="2" autoResize placeholder="ex.: Revisão geral, Pedal e Pastilhas." ref={servicesRef} />
+                            <div className={`${props.viewOnly ? 'd-p-none' : 'p-d-flex hide-on-print'}`}>
+                                <InputTextarea disabled={props.viewOnly} id="services" type="text" rows="2" autoResize placeholder="ex.: Revisão geral, Pedal e Pastilhas." ref={servicesRef} />
                                 <div className="p-inputgroup p-ml-2 mw-200">
                                     <span className="p-inputgroup-addon">
                                         <span>R$</span>
                                     </span>
                                     <span className="p-float-label">
-                                        <InputNumber id="value" mode="decimal" minFractionDigits={2} maxFractionDigits={2} ref={valueRef} />
+                                        <InputNumber disabled={props.viewOnly} id="value" mode="decimal" minFractionDigits={2} maxFractionDigits={2} ref={valueRef} />
                                         <label htmlFor="inputgroup" />
                                     </span>
                                 </div>
@@ -132,11 +133,11 @@ const OSForm = props => {
                         </div>
                         <div className="p-field p-col-12 p-md-4">
                             <label htmlFor="date">Data</label>
-                            <Calendar id="date" showIcon value={date} onChange={e => setDate(e.value)} dateFormat='dd/mm/yy' />
+                            <Calendar disabled={props.viewOnly} id="date" showIcon value={date} onChange={e => setDate(e.value)} dateFormat='dd/mm/yy' />
                         </div>
                         <div className="p-field p-col-6 p-md-4">
                             <label htmlFor="color">Marca/Modelo/Cor</label>
-                            <InputText id="color" type="text" ref={colorRef} />
+                            <InputText disabled={props.viewOnly} id="color" type="text" ref={colorRef} />
                         </div>
 
                         <div className="p-field p-col-6 p-md-4 p-text-center" style={{ fontSize: '1.25rem' }}>
@@ -144,7 +145,7 @@ const OSForm = props => {
                             <span>R$ {servicesTotalAmount}</span>
                         </div>
                     </div>
-                    <div className='p-d-flex p-d-flex p-jc-end hide-on-print'>
+                    <div className={`${props.viewOnly ? 'd-p-none' : 'p-d-flex p-d-flex p-jc-end hide-on-print'}`} >
                         <Button label='Cancelar' onClick={props.onCancel} type='button' className="p-button-outlined p-button-secondary hide-on-print" />
                         <Button type='submit' label={isUpdating ? 'Atualizar' : 'Salvar'} className="p-button-success p-ml-2 hide-on-print" />
                     </div >
