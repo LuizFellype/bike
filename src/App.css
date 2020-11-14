@@ -46,3 +46,10 @@
         display: none !important;
     }
 }
+
+@media (max-width: 380px) {
+
+  .button-sm {
+    padding: 8px;
+  }
+}

@@ -122,7 +122,7 @@ const OSForm = props => {
                                 })
                             }
                             <div className={`${props.viewOnly ? 'd-p-none' : 'p-d-flex hide-on-print'}`}>
-                                <InputTextarea disabled={props.viewOnly} id="services" type="text" rows="2" autoResize placeholder="ex.: Revisão geral, Pedal e Pastilhas." ref={servicesRef} />
+                                <InputTextarea disabled={props.viewOnly} id="services" type="text" rows="2" autoResize ref={servicesRef} />
                                 <div className="p-inputgroup p-ml-2 mw-200">
                                     <span className="p-inputgroup-addon">
                                         <span>R$</span>
@@ -150,7 +150,7 @@ const OSForm = props => {
                         </div>
                     </div>
 
-                    <div className={`${props.viewOnly ? 'd-p-none' : 'p-d-flex p-d-flex p-jc-end hide-on-print'}`} >
+                    <div className={'p-d-flex p-jc-end hide-on-print'} >
                         {props.selected && <Button label='Compartilhar' onClick={async () => {
                             const sharableUrl = `${window.location.origin}/os/${props.selected.osNumber}`
                             try {
@@ -167,9 +167,12 @@ const OSForm = props => {
                                     detail: 'Link compartilhável da OS copiado com sucesso.'
                                 })
                             }
-                        }} type='button' className="p-button-outlined p-button-primary hide-on-print" />}
-                        <Button label='Cancelar' onClick={props.onCancel} type='button' className="p-button-outlined p-button-secondary p-ml-2 hide-on-print" />
-                        <Button type='submit' label={isUpdating ? 'Atualizar' : 'Salvar'} className="p-button-success p-ml-2 hide-on-print" />
+                        }} type='button' className="p-button-outlined p-button-primary button-sm" />}
+
+                        <div className={`${props.viewOnly ? 'd-p-none' : 'p-d-flex'}`} >
+                            <Button label='Cancelar' onClick={props.onCancel} type='button' className="p-button-outlined p-button-secondary p-ml-1 button-sm" />
+                            <Button type='submit' label={isUpdating ? 'Atualizar' : 'Salvar'} className="p-button-success p-ml-1 button-sm" />
+                        </div>
                     </div >
                 </div >
             </form>
