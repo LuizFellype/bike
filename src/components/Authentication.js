@@ -28,7 +28,7 @@ const Authentication = (props) => {
     return <div className="p-mt-4">
         {isSignedIn ? (
             <>
-                <button onClick={() => FB.auth().signOut()}>Deslogar</button>
+                {/* <button onClick={() => FB.auth().signOut()}>Deslogar</button> */}
                 {props.children}
             </>
         ) : (

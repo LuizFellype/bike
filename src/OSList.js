@@ -19,7 +19,7 @@ export const OSList = withRouter((props) => {
   const handleKeyDown = async (e) => {
     if (e.keyCode === 13) {
       const { data: list, type } = await getAllByOSOrPhone(e.customValue || searchRef.current.element.value)
-      console.log({ list, type })
+      
       if (list.length && type === CONSTS.GENERAL_KEYS.osByKeys.osNumber) {
         props.onOSSelect(list[0])
       }

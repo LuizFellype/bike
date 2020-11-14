@@ -9,8 +9,12 @@ import { Calendar } from 'primereact/calendar';
 import { Button } from 'primereact/button';
 import { Card } from 'primereact/card';
 import { normalizeCurrency, updateItembyIndex } from './helpers/normalizeOS';
+import { withRouter } from 'react-router-dom';
+import copy from 'clipboard-copy';
+import { useToastContext } from './hooks/ToastContext';
 
 const OSForm = props => {
+    const toastRef = useToastContext()
     const [date, setDate] = React.useState(() => new Date())
     const [phone, setPhone] = React.useState('')
     const [services, setServices] = React.useState([{ service: 'Revisão geral', value: '150,00' }])
@@ -56,8 +60,8 @@ const OSForm = props => {
             value: valueRef.current.inputEl.value,
             date: !!date ? new Date(date).getTime() : new Date().getTime()
         }
-        
-        isUpdating ? props.onSubmit({...props.selected, ...formValues}, props.selected.id) : props.onSubmit(formValues)
+
+        isUpdating ? props.onSubmit({ ...props.selected, ...formValues }, props.selected.id) : props.onSubmit(formValues)
     }
 
     const handleAddService = () => {
@@ -68,9 +72,9 @@ const OSForm = props => {
         servicesRef.current.element.value = ''
         valueRef.current.inputEl.value = ''
     }
-    
+
     if (props.viewOnly && !props.selected) return <></>
-    
+
     return (
         <Card>
             {
@@ -96,7 +100,7 @@ const OSForm = props => {
                                     return <div className='p-d-flex p-mb-1' key={idx}>
                                         <InputTextarea disabled={props.viewOnly} id="services" type="text" rows="2" autoResize placeholder="ex.: Revisão geral, Pedal e Pastilhas." value={service} onChange={(e) => {
                                             const valuesUpdated = updateItembyIndex(idx, services, { service: e.currentTarget.value, value })
-                                            console.log({idx, valuesUpdated, e})
+                                            console.log({ idx, valuesUpdated, e })
                                             setServices(valuesUpdated)
                                         }} />
 
@@ -145,8 +149,26 @@ const OSForm = props => {
                             <span>R$ {servicesTotalAmount}</span>
                         </div>
                     </div>
+
                     <div className={`${props.viewOnly ? 'd-p-none' : 'p-d-flex p-d-flex p-jc-end hide-on-print'}`} >
-                        <Button label='Cancelar' onClick={props.onCancel} type='button' className="p-button-outlined p-button-secondary hide-on-print" />
+                        {props.selected && <Button label='Compartilhar' onClick={async () => {
+                            const sharableUrl = `${window.location.origin}/os/${props.selected.osNumber}`
+                            try {
+                                await navigator.share({
+                                    title: `OS: ${props.selected.osNumber} - Velo27`,
+                                    text: 'Detalhes de sua Ordem de Serviço na oficina Velo27',
+                                    url: sharableUrl
+                                })
+                            } catch (error) {
+                                copy(sharableUrl)
+                                toastRef.current.show({
+                                    severity: 'success',
+                                    summary: 'SUCESSO!',
+                                    detail: 'Link compartilhável da OS copiado com sucesso.'
+                                })
+                            }
+                        }} type='button' className="p-button-outlined p-button-primary hide-on-print" />}
+                        <Button label='Cancelar' onClick={props.onCancel} type='button' className="p-button-outlined p-button-secondary p-ml-2 hide-on-print" />
                         <Button type='submit' label={isUpdating ? 'Atualizar' : 'Salvar'} className="p-button-success p-ml-2 hide-on-print" />
                     </div >
                 </div >
@@ -155,4 +177,4 @@ const OSForm = props => {
     );
 }
 
-export default OSForm
+export default withRouter(OSForm)
