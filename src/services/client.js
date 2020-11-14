@@ -69,5 +69,4 @@ export const getAllByOSOrPhone = async (OSOrPhone) => {
         snapshotByOsNumber.forEach(pushToData)
         return { data: data.reverse(), type: CONSTS.GENERAL_KEYS.osByKeys.osNumber }
     }
-
 }
