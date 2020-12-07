@@ -12,9 +12,11 @@ import { normalizeCurrency, updateItembyIndex } from './helpers/normalizeOS';
 import { withRouter } from 'react-router-dom';
 import copy from 'clipboard-copy';
 import { useToastContext } from './hooks/ToastContext';
+import { UserExtraInfo } from './components/UserExtraInfo';
 
 const OSForm = props => {
     const toastRef = useToastContext()
+    const [extraInfo, setExtraInfo] = React.useState({})
     const [date, setDate] = React.useState(() => new Date())
     const [phone, setPhone] = React.useState('')
     const [services, setServices] = React.useState([{ service: 'Revisão geral', value: '150,00' }])
@@ -42,6 +44,7 @@ const OSForm = props => {
             colorRef.current.element.value = color
             valueRef.current.inputEl.value = value
             setDate(new Date(date))
+            setExtraInfo(props.selected.extraInfo || {})
         }
     }, [props.selected])
 
@@ -58,7 +61,8 @@ const OSForm = props => {
             services: services,
             color: colorRef.current.element.value,
             value: valueRef.current.inputEl.value,
-            date: !!date ? new Date(date).getTime() : new Date().getTime()
+            date: !!date ? new Date(date).getTime() : new Date().getTime(),
+            extraInfo,
         }
 
         isUpdating ? props.onSubmit({ ...props.selected, ...formValues }, props.selected.id) : props.onSubmit(formValues)
@@ -73,7 +77,14 @@ const OSForm = props => {
         valueRef.current.inputEl.value = ''
     }
 
+    const handleExtraInfoChange = React.useCallback((e) => {
+        const { id, value } = e.currentTarget
+
+        setExtraInfo({ ...extraInfo, [id]: value })
+    }, [extraInfo])
+
     if (props.viewOnly && !props.selected) return <></>
+
 
     return (
         <Card>
@@ -89,10 +100,13 @@ const OSForm = props => {
                             <label htmlFor="firstname6">Nome</label>
                             <InputText disabled={props.viewOnly} id="firstname6" type="text" placeholder="ex.: Luiz Fellype" ref={nameRef} required />
                         </div>
-                        <div className="p-field p-col-12 p-md-6">
+                        <div className="p-field p-col-10 p-md-5">
                             <label htmlFor="phone">Phone</label>
-                            <InputMask disabled={props.viewOnly} id="phone" mask="99999-9999" placeholder="99999-9999" value={phone} onChange={e => setPhone(e.value)} required />
+                            <InputMask disabled={props.viewOnly} id="phone" mask="999999999?99" value={phone} onChange={e => setPhone(e.value)} required />
                         </div>
+                        
+                        <UserExtraInfo values={extraInfo} onChange={handleExtraInfoChange} viewOnly={props.viewOnly}/>
+
                         <div className="p-field p-col-12">
                             <label htmlFor="services">Peças / Acessórios / Serviços</label>
                             {

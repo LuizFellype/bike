@@ -15,8 +15,8 @@ export const normalizeCurrency = (currency, reverse = false) => {
     return Number(currencyAsString.replace(/\./g, '').replace(',', '.'))
 }
 
-export const normalizeOS = (removeDashFromPhone = true) => (OS) => {
-    return { ...OS, phone: normalizePhone(OS.phone, removeDashFromPhone) }
+export const normalizeOS = () => (OS) => {
+    return OS
 }
 
 

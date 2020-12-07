@@ -60,6 +60,8 @@ function OsPage(props) {
     return (
         <>
             <Toast ref={toastRef} />
+            {isAdmin && !!os && <button style={{ float: 'left' }} onClick={() => props.history.push('/')}>Pag. principal</button>}
+
             <div className="demo-container p-mx-2 p-mt-4 p-m-sm-5 p-mx-lg-6 ">
                 {!rootNotAdmin && <OSPresentation selected={selected} onSubmit={handleSubmit} onCancel={() => setSelected(undefined)} viewOnly={!!os} />}
 

@@ -53,3 +53,16 @@
     padding: 8px;
   }
 }
+
+@keyframes fadeInAnimation{
+  0%{
+      transform: scale(0);
+      }
+  99%{
+      transform: scale(1);
+      }
+}
+
+.fade-in {
+  animation: fadeInAnimation .2s 1 0s linear;
+}
