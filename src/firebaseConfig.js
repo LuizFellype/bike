@@ -8,13 +8,13 @@ const firebaseConfig = {
     storageBucket: process.env.REACT_APP_storageBucket,
     messagingSenderId: process.env.REACT_APP_messagingSenderId,
     appId: process.env.REACT_APP_appId,
-    measurementId: process.env.REACT_APP_measurementId
+    // measurementId: process.env.REACT_APP_measurementId
 };
 // console.log('firebaseConfig', firebaseConfig)
 // Initialize Firebase
 firebase.initializeApp(firebaseConfig);
 firebase.firestore().enablePersistence()
-firebase.analytics();
+// firebase.analytics();
 
 export const FB = firebase
 export const FBDatabase = firebase.firestore()
