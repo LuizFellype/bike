@@ -22,12 +22,6 @@ export default function Router() {
                 <DomRouter history={customHistory}>
                     <Switch>
                         <PrivateRoute exact path={['/', '/admin']} component={OsPage} />
-                        {/* <Route  >
-                            <Authentication >
-                                <OsPage />
-                            </Authentication>
-                        </Route> */}
-                        {/* <Route exact path={'/admin'} component={Authentication} /> */}
                         <Route exact path={'/os/:os'} component={OsPage} />
                         <Route path="*" >
                             <Redirect to='/' />

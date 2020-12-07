@@ -65,7 +65,10 @@ export const OSList = withRouter((props) => {
         !!data && data.length ?
           <div className="card">
             {/* <DataTable value={data} selection={selected} onSelectionChange={e => this.setState({ selectedProduct1: e.value })} selectionMode="single"> */}
-            <DataTable value={data} onSelectionChange={e => props.onOSSelect(e.value)} selectionMode="single">
+            <DataTable value={data} onSelectionChange={e => {
+              // props.onOSSelect(e.value)
+              props.history.push(`/os/${e.value.osNumber}`)
+              }} selectionMode="single">
               <Column field="osNumber" header="OS"></Column>
               <Column field="name" header="Nome"></Column>
               <Column field="phone" header="Telefone"></Column>

@@ -70,3 +70,18 @@ export const getAllByOSOrPhone = async (OSOrPhone) => {
         return { data: data.reverse(), type: CONSTS.GENERAL_KEYS.osByKeys.osNumber }
     }
 }
+
+
+
+export const getUserRoles = async (userId) => {
+    const snapShot = await FBDatabase.doc(`users/${userId}`).get()
+    // const snapShot = await usersRef
+
+    if (!snapShot.exists) {
+        return {}
+    }
+
+    const data = snapShot.data()
+
+    return data
+}
