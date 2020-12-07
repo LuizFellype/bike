@@ -13,7 +13,7 @@ const uiConfig = {
         FB.auth.EmailAuthProvider.PROVIDER_ID
     ],
     callbacks: {
-        signInSuccess: () => false
+        signInSuccessWithAuthResult: () => false
     }
 }
 

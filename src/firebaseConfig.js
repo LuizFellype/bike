@@ -1,4 +1,6 @@
-import firebase from "firebase"
+import * as Firebase from "firebase/app"
+import "firebase/firestore"
+import "firebase/auth"
 
 const firebaseConfig = {
     apiKey: process.env.REACT_APP_apiKey,
@@ -9,12 +11,10 @@ const firebaseConfig = {
     messagingSenderId: process.env.REACT_APP_messagingSenderId,
     appId: process.env.REACT_APP_appId,
     // measurementId: process.env.REACT_APP_measurementId
-};
-// console.log('firebaseConfig', firebaseConfig)
-// Initialize Firebase
-firebase.initializeApp(firebaseConfig);
-firebase.firestore().enablePersistence()
-// firebase.analytics();
+}
 
-export const FB = firebase
-export const FBDatabase = firebase.firestore()
+Firebase.initializeApp(firebaseConfig);
+Firebase.firestore().enablePersistence()
+
+export const FB = Firebase
+export const FBDatabase = Firebase.firestore()
