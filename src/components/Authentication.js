@@ -41,7 +41,6 @@ const Authentication = (props) => {
     return <div className="p-mt-4">
         {isSignedIn ? (
             <>
-                <button style={{ float: 'right' }} onClick={() => FB.auth().signOut()}>Deslogar</button>
                 <AuthContext.Provider value={authCtxValue}>
                     {props.children}
                 </AuthContext.Provider>
@@ -59,6 +58,6 @@ export default withRouter(Authentication)
 
 export const useAuthCtx = () => {
     const authCtxValues = React.useContext(AuthContext)
-    
+
     return authCtxValues
 }
