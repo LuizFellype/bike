@@ -8,7 +8,7 @@ import { InputMask } from 'primereact/inputmask';
 import { Calendar } from 'primereact/calendar';
 import { Button } from 'primereact/button';
 import { Card } from 'primereact/card';
-import { normalizeCurrency, updateItembyIndex } from './helpers/normalizeOS';
+import { cleanServicesAndPecas, normalizeCurrency, updateItembyIndex } from './helpers/normalizeOS';
 import { withRouter } from 'react-router-dom';
 import copy from 'clipboard-copy';
 import { useToastContext } from './hooks/ToastContext';
@@ -20,10 +20,13 @@ const OSForm = props => {
     const [date, setDate] = React.useState(() => new Date())
     const [phone, setPhone] = React.useState('')
     const [services, setServices] = React.useState([{ service: 'Revisão geral', value: '150,00' }])
+    const [pecas, setPecas] = React.useState([{ peca: 'Corrente', value: '100,00' }])
     const nameRef = React.useRef()
     const servicesRef = React.useRef(null)
-    const colorRef = React.useRef(null)
     const valueRef = React.useRef(null)
+    const pecasRef = React.useRef(null)
+    const pecasValueRef = React.useRef(null)
+    const colorRef = React.useRef(null)
 
     // pre-populate inputs  
     React.useEffect(() => {
@@ -32,6 +35,7 @@ const OSForm = props => {
                 name,
                 phone: phoneSelected,
                 services,
+                pecas,
                 color,
                 value,
                 date
@@ -41,6 +45,7 @@ const OSForm = props => {
             nameRef.current.element.value = name
             setPhone(phoneSelected)
             setServices(services)
+            setPecas(pecas)
             colorRef.current.element.value = color
             valueRef.current.inputEl.value = value
             setDate(new Date(date))
@@ -52,13 +57,17 @@ const OSForm = props => {
     const servicesTotalAmount = services.reduce((acc, { value }) => {
         return acc + normalizeCurrency(value)
     }, 0)
+    const pecasTotalAmount = pecas.reduce((acc, { value }) => {
+        return acc + normalizeCurrency(value)
+    }, 0)
 
     const handleForm = (e) => {
         e.preventDefault()
         const formValues = {
             name: nameRef.current.element.value,
             phone: phone,
-            services: services,
+            services: cleanServicesAndPecas(services, 'service'),
+            pecas: cleanServicesAndPecas(pecas, 'peca'),
             color: colorRef.current.element.value,
             value: valueRef.current.inputEl.value,
             date: !!date ? new Date(date).getTime() : new Date().getTime(),
@@ -68,13 +77,22 @@ const OSForm = props => {
         isUpdating ? props.onSubmit({ ...props.selected, ...formValues }, props.selected.id) : props.onSubmit(formValues)
     }
 
-    const handleAddService = () => {
-        setServices([
-            ...services,
-            { service: servicesRef.current.element.value, value: valueRef.current.inputEl.value }
-        ])
-        servicesRef.current.element.value = ''
-        valueRef.current.inputEl.value = ''
+    const handleAddServiceAndPecas = (isPecas) => {
+        if (isPecas) {
+            setPecas([
+                ...pecas,
+                { peca: pecasRef.current.element.value, value: pecasValueRef.current.inputEl.value }
+            ])
+            pecasRef.current.element.value = ''
+            pecasValueRef.current.inputEl.value = ''
+        } else {
+            setServices([
+                ...services,
+                { service: servicesRef.current.element.value, value: valueRef.current.inputEl.value }
+            ])
+            servicesRef.current.element.value = ''
+            valueRef.current.inputEl.value = ''
+        }
     }
 
     const handleExtraInfoChange = React.useCallback((e) => {
@@ -104,11 +122,12 @@ const OSForm = props => {
                             <label htmlFor="phone">Phone</label>
                             <InputMask disabled={props.viewOnly} id="phone" mask="999999999?99" value={phone} onChange={e => setPhone(e.value)} required />
                         </div>
-                        
-                        <UserExtraInfo values={extraInfo} onChange={handleExtraInfoChange} viewOnly={props.viewOnly}/>
+
+                        <UserExtraInfo values={extraInfo} onChange={handleExtraInfoChange} viewOnly={props.viewOnly} />
+
 
                         <div className="p-field p-col-12">
-                            <label htmlFor="services">Peças / Acessórios / Serviços</label>
+                            <label htmlFor="services">Serviços</label>
                             {
                                 services.map(({ service, value }, idx) => {
                                     return <div className='p-d-flex p-mb-1' key={idx}>
@@ -146,7 +165,49 @@ const OSForm = props => {
                                         <label htmlFor="inputgroup" />
                                     </span>
                                 </div>
-                                <Button onClick={handleAddService} icon='pi pi-plus' className="p-button-outlined p-button-lg p-button-primary p-ml-2" tooltip='Click para adicionar o serviço.' type='button' tooltipOptions={{ position: 'bottom' }} />
+                                <Button onClick={() => handleAddServiceAndPecas()} icon='pi pi-plus' className="p-button-outlined p-button-lg p-button-primary p-ml-2" tooltip='Click para adicionar o serviço.' type='button' tooltipOptions={{ position: 'bottom' }} />
+                            </div>
+                        </div>
+
+                        <div className="p-field p-col-12">
+                            <label htmlFor="pecas">Peças / Acessórios</label>
+                            {
+                                pecas.map(({ peca, value }, idx) => {
+                                    return <div className='p-d-flex p-mb-1' key={idx}>
+                                        <InputTextarea disabled={props.viewOnly} id="pecas" type="text" rows="2" autoResize placeholder="ex.: Pedal, Corrente ..." value={peca} onChange={(e) => {
+                                            const valuesUpdated = updateItembyIndex(idx, pecas, { peca: e.currentTarget.value, value })
+
+                                            setPecas(valuesUpdated)
+                                        }} />
+
+                                        <div className="p-inputgroup p-ml-2 mw-200">
+                                            <span className="p-inputgroup-addon">
+                                                <span>R$</span>
+                                            </span>
+                                            <span className="p-float-label">
+                                                <InputNumber disabled={props.viewOnly} id="value" mode="decimal" minFractionDigits={2} maxFractionDigits={2} value={normalizeCurrency(value)} onChange={(e) => {
+                                                    const value = normalizeCurrency(e.value, true)
+                                                    const valuesUpdated = updateItembyIndex(idx, services, { peca, value })
+                                                    setPecas(valuesUpdated)
+                                                }} />
+                                                <label htmlFor="inputgroup" />
+                                            </span>
+                                        </div>
+                                    </div>
+                                })
+                            }
+                            <div className={`${props.viewOnly ? 'd-p-none' : 'p-d-flex hide-on-print'}`}>
+                                <InputTextarea disabled={props.viewOnly} id="services" type="text" rows="2" autoResize ref={pecasRef} />
+                                <div className="p-inputgroup p-ml-2 mw-200">
+                                    <span className="p-inputgroup-addon">
+                                        <span>R$</span>
+                                    </span>
+                                    <span className="p-float-label">
+                                        <InputNumber disabled={props.viewOnly} id="value" mode="decimal" minFractionDigits={2} maxFractionDigits={2} ref={pecasValueRef} />
+                                        <label htmlFor="inputgroup" />
+                                    </span>
+                                </div>
+                                <Button onClick={() => handleAddServiceAndPecas(true)} icon='pi pi-plus' className="p-button-outlined p-button-lg p-button-primary p-ml-2" tooltip='Click para adicionar a peça.' type='button' tooltipOptions={{ position: 'bottom' }} />
                             </div>
                         </div>
                         <div className="p-field p-col-12 p-md-4">
@@ -160,7 +221,7 @@ const OSForm = props => {
 
                         <div className="p-field p-col-6 p-md-4 p-text-center" style={{ fontSize: '1.25rem' }}>
                             <h3 className='p-mt-1 p-mb-2'>Total</h3>
-                            <span>R$ {servicesTotalAmount}</span>
+                            <span>R$ {servicesTotalAmount + pecasTotalAmount}</span>
                         </div>
                     </div>
 

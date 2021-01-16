@@ -15,6 +15,14 @@ export const normalizeCurrency = (currency, reverse = false) => {
     return Number(currencyAsString.replace(/\./g, '').replace(',', '.'))
 }
 
+export const cleanServicesAndPecas = (arr, key) => {
+    const filtered = arr.filter(item => {
+        return !!item[key] && !!item.value && Number(normalizeCurrency(item.value)) > 0
+    })
+    
+    return filtered
+}
+
 export const normalizeOS = () => (OS) => {
     return OS
 }
