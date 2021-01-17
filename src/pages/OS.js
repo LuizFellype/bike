@@ -56,20 +56,18 @@ function OsPage(props) {
     }, [])
 
     const rootNotAdmin = React.useMemo(() => !isAdmin && !os, [isAdmin, os])
-    
+
     return (
         <>
             <Toast ref={toastRef} />
 
-            <div className="demo-container p-mx-2 p-mt-4 p-mx-lg-6">
-                {!rootNotAdmin && <OSPresentation selected={selected} onSubmit={handleSubmit} onCancel={() => setSelected(undefined)} viewOnly={!!os} />}
+            {!rootNotAdmin && <OSPresentation selected={selected} onSubmit={handleSubmit} onCancel={() => setSelected(undefined)} viewOnly={!!os} />}
 
-                {!!os && <div className="p-mt-2"></div>}
+            {!!os && <div className="p-mt-2"></div>}
 
-                <OSList
-                    onOSSelect={!!os ? setSelected : (os) => props.history.push(`/os/${os.osNumber}`)}
-                />
-            </div>
+            <OSList
+                onOSSelect={!!os ? setSelected : (os) => props.history.push(`/os/${os.osNumber}`)}
+            />
         </>
     );
 }

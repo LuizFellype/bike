@@ -1,3 +1,5 @@
+import { mergeDeepWith, concat } from 'ramda'
+
 export const normalizePhone = (phone, removeDash = true) => {
     const phoneAsString = `${phone}`
     if (removeDash) {
@@ -9,7 +11,7 @@ export const normalizePhone = (phone, removeDash = true) => {
 
 export const normalizeCurrency = (currency, reverse = false) => {
     const currencyAsString = `${currency || 0}`
-    if (reverse) { 
+    if (reverse) {
         return currencyAsString.replace('.', ',')
     }
     return Number(currencyAsString.replace(/\./g, '').replace(',', '.'))
@@ -19,7 +21,7 @@ export const cleanServicesAndPecas = (arr, key) => {
     const filtered = arr.filter(item => {
         return !!item[key] && !!item.value && Number(normalizeCurrency(item.value)) > 0
     })
-    
+
     return filtered
 }
 
@@ -39,4 +41,19 @@ export const updateItembyIndex = (idx, arr, itemToUpdate) => {
     const arrModified = [...before, itemToUpdate, ...after]
 
     return arrModified
+}
+
+const getTotalOfValues = (arr) => arr.reduce((acc, { value }) => {
+    return acc + normalizeCurrency(value)
+}, 0)
+
+export const formatServicesAndPecasToReport = (services = [], pecas = []) => {
+    const servicesTotal = getTotalOfValues(services)
+    const pecasTotal = getTotalOfValues(pecas)
+
+    const pecasNormalized = pecas.map(({ value, ...item }) => ({ ...item, pecaValue: value }))
+
+    const allTogether = Object.values(mergeDeepWith(concat, services, pecasNormalized))
+
+    return { data: allTogether, services: servicesTotal, pecas: pecasTotal, total: servicesTotal + pecasTotal }
 }

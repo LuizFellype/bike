@@ -1,0 +1,52 @@
+.badge {
+    border-radius: 2px !important;
+    padding: .25em .5rem !important;
+    text-transform: uppercase !important;
+    font-weight: 700 !important;
+    font-size: 20px;
+    letter-spacing: .3px !important;
+}
+.green {
+    background: #c8e6c9 ;
+    color: #256029;
+}
+.yellow {
+    background: #FEEDAF;
+    color: #8A5340;
+}
+
+.datatable-responsive-demo .p-datatable-responsive-demo .p-datatable-tbody > tr > td {
+    display: none !important;
+}
+
+@media screen and (max-width: 500px) {
+    .badge {
+        font-size: 13.5px;
+    }
+
+    .datatable-responsive-demo .p-datatable.p-datatable-responsive-demo .p-datatable-thead > tr > th,
+    .datatable-responsive-demo .p-datatable.p-datatable-responsive-demo .p-datatable-tfoot > tr > td {
+        display: none !important;
+    }
+
+    .datatable-responsive-demo .p-datatable.p-datatable-responsive-demo .p-datatable-tbody > tr > td {
+        text-align: left !important;
+        display: block !important;
+        width: 100% !important;
+        float: left !important;
+        clear: left !important;
+        border: 0 none !important;
+    }
+
+    .datatable-responsive-demo .p-datatable.p-datatable-responsive-demo .p-datatable-tbody > tr > td {
+        padding: .4rem !important;
+        min-width: 30% !important;
+        display: inline-block !important;
+        margin: -.4em 1em -.4em -.4rem !important;
+        font-weight: bold !important;
+    }
+
+    .datatable-responsive-demo .p-datatable.p-datatable-responsive-demo .p-datatable-tbody > tr:last-child {
+        border-bottom: 1px solid var(--surface-d) !important;
+    }
+}

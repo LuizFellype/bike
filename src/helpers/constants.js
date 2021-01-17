@@ -8,5 +8,8 @@ export const CONSTS = {
             osNumber: 'osNumber', 
             phone: 'phone', 
         }
+    },
+    PERMISSIONS: {
+        private: 'private'
     }
 }
