@@ -21,6 +21,7 @@ export const OSList = withRouter((props) => {
       const { data: list, type } = await getAllByOSOrPhone(e.customValue || searchRef.current.element.value)
       
       if (list.length && type === CONSTS.GENERAL_KEYS.osByKeys.osNumber) {
+        console.log('list', list)
         props.onOSSelect(list[0])
       }
       setData(list)
@@ -66,8 +67,8 @@ export const OSList = withRouter((props) => {
           <div className="card">
             {/* <DataTable value={data} selection={selected} onSelectionChange={e => this.setState({ selectedProduct1: e.value })} selectionMode="single"> */}
             <DataTable value={data} onSelectionChange={e => {
-              // props.onOSSelect(e.value)
-              props.history.push(`/os/${e.value.osNumber}`)
+              props.onOSSelect(e.value)
+              // props.history.push(`/os/${e.value.osNumber}`)
               }} selectionMode="single">
               <Column field="osNumber" header="OS"></Column>
               <Column field="name" header="Nome"></Column>

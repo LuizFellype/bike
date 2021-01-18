@@ -55,18 +55,21 @@ function OsPage(props) {
         checkForLastOsNumber()
     }, [])
 
-    const rootNotAdmin = React.useMemo(() => !isAdmin && !os, [isAdmin, os])
-
+    // const rootNotAdmin = React.useMemo(() => !isAdmin && !os, [isAdmin, os])
+    console.log('selected', selected)
     return (
         <>
             <Toast ref={toastRef} />
 
-            {!rootNotAdmin && <OSPresentation selected={selected} onSubmit={handleSubmit} onCancel={() => setSelected(undefined)} viewOnly={!!os} />}
+            <OSPresentation selected={selected} onSubmit={handleSubmit} onCancel={() => setSelected(undefined)} viewOnly={!!os} />
 
             {!!os && <div className="p-mt-2"></div>}
 
             <OSList
-                onOSSelect={!!os ? setSelected : (os) => props.history.push(`/os/${os.osNumber}`)}
+                onOSSelect={(os) => {
+                    console.log({isAdmin})
+                    isAdmin ? setSelected(os) : props.history.push(`/os/${os.osNumber}`)
+                }}
             />
         </>
     );

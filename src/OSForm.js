@@ -34,8 +34,8 @@ const OSForm = props => {
             const {
                 name,
                 phone: phoneSelected,
-                services,
-                pecas,
+                services = [],
+                pecas = [],
                 color,
                 value,
                 date
@@ -101,6 +101,7 @@ const OSForm = props => {
         setExtraInfo({ ...extraInfo, [id]: value })
     }, [extraInfo])
 
+    console.log('props.selected: ', props.selected)
     if (props.viewOnly && !props.selected) return <></>
 
 

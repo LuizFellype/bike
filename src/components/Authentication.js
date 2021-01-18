@@ -41,23 +41,29 @@ const Authentication = (props) => {
         ...userRoles
     }), [isSignedIn, userRoles])
 
-    const isAdmin = isSignedIn && userRoles.isAdmin
-    const privateValidation = props.auth === CONSTS.PERMISSIONS.private && isAdmin
-    const showHomeButton = props.location.pathname !== '/' && isAdmin
+    const signOut = () => FB.auth().signOut().catch(() => props.history.push('/'))
 
+    const isAdmin = isSignedIn && userRoles.isAdmin
+    const privateNotValid = props.auth === CONSTS.PERMISSIONS.private && !isAdmin
+    const showHomeButton = props.location.pathname !== '/' && isAdmin
+    console.log({
+        isSignedIn, isAdmin, props,
+        privateNotValid
+    })
     return <div className="p-mt-4">
-        {isSignedIn ? (privateValidation ? (
-            <div className="demo-container p-mx-2 p-mt-4 p-mx-lg-6">
+        {isSignedIn ? (privateNotValid ? (
+            <div className='p-d-flex p-jc-center'><Button label='Deslogar' tooltip='Você não tem permissão para acessar o conteudo desta pagina, porfavor deslogue e entre com uma conta admin.' onClick={signOut} /></div>
+        ) : <div className="demo-container p-mx-2 p-mt-4 p-mx-lg-6">
                 <AuthContext.Provider value={authCtxValue}>
                     <div className={`p-d-flex p-jc-between p-ai-${showHomeButton ? 'start' : 'center'} p-mt-4 p-mb-sm-2`}>
                         {!!showHomeButton && <Button onClick={() => props.history.push('/')} icon='pi pi-home' tooltip='Ir para pagina principal' className='p-button-outlined' />}
                         <img src={logo} width='65px' alt="Velo27 logo" />
-                        <Button onClick={() => FB.auth().signOut().catch(() => props.history.push('/'))} icon='pi pi-sign-out' tooltip='Deslogar' className='p-button-outlined' />
+                        <Button onClick={signOut} icon='pi pi-sign-out' tooltip='Deslogar' className='p-button-outlined' />
                     </div>
                     {props.children}
                 </AuthContext.Provider>
             </div>
-        ) : <div className='p-d-flex p-jc-center'><Button label='Deslogar' tooltip='Você não tem permissão para acessar o conteudo desta pagina, porfavor deslogue e entre com uma conta admin.' /></div>)  : (
+        ) : (
                 <StyledFirebaseAuth
                     uiConfig={uiConfig}
                     firebaseAuth={FB.auth()}

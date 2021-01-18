@@ -43,7 +43,7 @@ export const updateItembyIndex = (idx, arr, itemToUpdate) => {
     return arrModified
 }
 
-const getTotalOfValues = (arr) => arr.reduce((acc, { value }) => {
+const getTotalOfValues = (arr = []) => arr.reduce((acc, { value }) => {
     return acc + normalizeCurrency(value)
 }, 0)
 

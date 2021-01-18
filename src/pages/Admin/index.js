@@ -19,7 +19,7 @@ const AdminPage = () => {
         const dayIntheWeek = dateNow.getDay()
         const lastSunday = today.plus({ days: -dayIntheWeek }).ts
 
-        getOSFromDate(lastSunday).then(data => {
+        getOSFromDate(lastSunday).then((data = []) => {
             const { services, pecas } = data.reduce((acc, item) => {
                 return { services: [...acc.services, ...item.services], pecas: [...acc.pecas, ...item.pecas] }
             }, { services: [], pecas: [] })
