@@ -21,7 +21,6 @@ export const OSList = withRouter((props) => {
       const { data: list, type } = await getAllByOSOrPhone(e.customValue || searchRef.current.element.value)
       
       if (list.length && type === CONSTS.GENERAL_KEYS.osByKeys.osNumber) {
-        console.log('list', list)
         props.onOSSelect(list[0])
       }
       setData(list)

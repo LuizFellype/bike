@@ -46,10 +46,6 @@ const Authentication = (props) => {
     const isAdmin = isSignedIn && userRoles.isAdmin
     const privateNotValid = props.auth === CONSTS.PERMISSIONS.private && !isAdmin
     const showHomeButton = props.location.pathname !== '/' && isAdmin
-    console.log({
-        isSignedIn, isAdmin, props,
-        privateNotValid
-    })
     return <div className="p-mt-4">
         {isSignedIn ? (privateNotValid ? (
             <div className='p-d-flex p-jc-center'><Button label='Deslogar' tooltip='Você não tem permissão para acessar o conteudo desta pagina, porfavor deslogue e entre com uma conta admin.' onClick={signOut} /></div>

@@ -56,7 +56,6 @@ function OsPage(props) {
     }, [])
 
     // const rootNotAdmin = React.useMemo(() => !isAdmin && !os, [isAdmin, os])
-    console.log('selected', selected)
     return (
         <>
             <Toast ref={toastRef} />
@@ -67,7 +66,6 @@ function OsPage(props) {
 
             <OSList
                 onOSSelect={(os) => {
-                    console.log({isAdmin})
                     isAdmin ? setSelected(os) : props.history.push(`/os/${os.osNumber}`)
                 }}
             />

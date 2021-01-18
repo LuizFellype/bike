@@ -101,9 +101,7 @@ const OSForm = props => {
         setExtraInfo({ ...extraInfo, [id]: value })
     }, [extraInfo])
 
-    console.log('props.selected: ', props.selected)
     if (props.viewOnly && !props.selected) return <></>
-
 
     return (
         <Card>
@@ -134,7 +132,6 @@ const OSForm = props => {
                                     return <div className='p-d-flex p-mb-1' key={idx}>
                                         <InputTextarea disabled={props.viewOnly} id="services" type="text" rows="2" autoResize placeholder="ex.: Revisão geral, Pedal e Pastilhas." value={service} onChange={(e) => {
                                             const valuesUpdated = updateItembyIndex(idx, services, { service: e.currentTarget.value, value })
-                                            console.log({ idx, valuesUpdated, e })
                                             setServices(valuesUpdated)
                                         }} />
 
