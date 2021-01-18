@@ -52,7 +52,10 @@ const Authentication = (props) => {
         ) : <div className="demo-container p-mx-2 p-mt-4 p-mx-lg-6">
                 <AuthContext.Provider value={authCtxValue}>
                     <div className={`p-d-flex p-jc-between p-ai-${showHomeButton ? 'start' : 'center'} p-mt-4 p-mb-sm-2`}>
-                        {!!showHomeButton && <Button onClick={() => props.history.push('/')} icon='pi pi-home' tooltip='Ir para pagina principal' className='p-button-outlined' />}
+                        <div>
+                        {!!showHomeButton && <Button onClick={() => props.history.push('/')} icon='pi pi-home' tooltip='Ir para página principal' className='p-button-outlined' />}
+                        {isAdmin && <Button onClick={() => props.history.push('/admin')} icon='pi pi-briefcase' tooltip='Relatório semanais' className='p-button-outlined p-ml-1' />}
+                        </div>
                         <img src={logo} width='65px' alt="Velo27 logo" />
                         <Button onClick={signOut} icon='pi pi-sign-out' tooltip='Deslogar' className='p-button-outlined' />
                     </div>
