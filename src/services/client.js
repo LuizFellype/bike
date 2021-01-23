@@ -73,15 +73,15 @@ export const getAllByOSOrPhone = async (OSOrPhone) => {
 
 
 export const getOSFromDate = async (date) => {
+    const dateTM = new Date(date).getTime()
     let data = []
     const pushToData = (doc) => {
         data = [...data, normalizeOS(false)({ ...doc.data(), id: doc.id })]
     }
 
     const snapshot = await FBDatabase.collection('os')
-    .where('date', '>=', date)
+    .where('date', '>=', dateTM)
     .get()
-    
     if (snapshot.empty) return []
     
     snapshot.forEach(pushToData)

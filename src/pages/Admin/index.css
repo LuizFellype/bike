@@ -19,6 +19,10 @@
     display: none !important;
 }
 
+.p-card-header {
+    margin-bottom: -20px
+}
+
 @media screen and (max-width: 500px) {
     .badge {
         font-size: 13.5px;
