@@ -49,31 +49,55 @@ const getDateFromTM = (TMDate = new Date().getTime()) => {
 
 const AdminPage = () => {
     const [loading, setLoading] = React.useState(true)
-    const [data, setData] = React.useState()
+    const [rawData, setRawData] = React.useState()
     const [totals, setTotals] = React.useState()
     const [dateFilter, setDateFilter] = React.useState()
     const [filter, setFilter] = React.useState(filterOptionsValues.Mensal)
 
     const getAllOSFromLastDate = (date) => {
         !loading && setLoading(true)
+        
         getOSFromDate(date).then((data = []) => {
             const { services, pecas } = data.reduce((acc, item) => {
-                const pecasToSpreed = item.pecas || [] 
-                return { services: [...acc.services, ...item.services], pecas: [...acc.pecas, ...pecasToSpreed] }
+                const pecasToSpreed = item.pecas || []
+                return {
+                    services: [...acc.services, ...item.services],
+                    pecas: [...acc.pecas, ...pecasToSpreed]
+                }
             }, { services: [], pecas: [] })
 
-            const { data: allTogether, ...allTotals } = formatServicesAndPecasToReport(services, pecas)
-            
-            setLoading(false)
-            setData(allTogether)
+            const allTotals = formatServicesAndPecasToReport(services, pecas)
+
+            const rawDataWithTotals = data.reduce((acc, item) => {
+                const { services, pecas } = item
+                const {
+                    services: servicesTotal,
+                    pecas: pecasTotal,
+                    total
+                } = formatServicesAndPecasToReport(services, pecas)
+
+                return [
+                    ...acc,
+                    {
+                        ...item,
+                        totalServices: servicesTotal,
+                        totalPecas: pecasTotal,
+                        total,
+                    }
+                ]
+            }, [])
+
+            setRawData(rawDataWithTotals)
             setTotals(allTotals)
             setDateFilter(date)
-        }).catch(console.error)
+
+            setLoading(false)
+        }).catch(e => console.error('>>>>>> ERROR', e))
     }
 
 
     useEffect(() => {
-        if (filter === filterOptionsValues.Semanal) { 
+        if (filter === filterOptionsValues.Semanal) {
             getAllOSFromLastDate(getLastSunday())
         } else {
             getAllOSFromLastDate(getFirstDayOfTheMonth())
@@ -95,13 +119,44 @@ const AdminPage = () => {
         <SelectButton value={filter} options={filterOptions} onChange={(e) => setFilter(e.value)} />
     </div>
 
+    const [expandedRows, setExpandedRows] = React.useState()
+    const rowExpansionTemplate = (data) => {
+        const servicesAndPecas = [...data.services, ...data.pecas]
+
+        return (
+            <div className="p-3">
+                <DataTable
+                    header={`${data.name} - ${data.phone} - ${getDateFromTM(data.date)}`}
+                    value={servicesAndPecas}
+                    emptyMessage='Nenhuma OS encontrada essa semana.'
+                    className='datatable-responsive-demo'
+                >
+                    <Column field="service" header="Services" ></Column>
+                    <Column field="value" header="Valor" ></Column>
+                    <Column field="peca" header="Peças" ></Column>
+                </DataTable>
+
+            </div>
+        );
+    };
+
     return (
         <Card header={Title} footer={footer} >
-            <DataTable value={data} loading={!data || loading} emptyMessage='Nenhuma OS encontrada essa semana.' className='datatable-responsive-demo'>
-                <Column field="service" header="Services" ></Column>
+            <DataTable
+                emptyMessage='Nenhuma OS encontrada essa semana.'
+                className='datatable-responsive-demo'
+                value={rawData} loading={!rawData || loading}
+                expandedRows={expandedRows} onRowToggle={(e) => {
+                    setExpandedRows(e.data)
+                }}
+                rowExpansionTemplate={rowExpansionTemplate}
+            >
+                <Column expander style={{ width: '2rem' }} />
+
+                <Column field="osNumber" header="OS #" ></Column>
+                <Column field="totalServices" header="Services" ></Column>
+                <Column field="totalPecas" header="Peças" ></Column>
                 <Column field="value" header="Valor" ></Column>
-                <Column field="peca" header="Peças" ></Column>
-                <Column field="pecaValue" header="Valor" ></Column>
             </DataTable>
         </Card >
     );

@@ -4,14 +4,14 @@ import { Toast } from 'primereact/toast';
 
 import { OSList } from '../OSList';
 import { OSPresentation } from '../components/OsPresentation';
-import { useAuthCtx } from '../components/Authentication';
+// import { useAuthCtx } from '../components/Authentication';
 
 function OsPage(props) {
     const [selected, setSelected] = React.useState()
     const [lastOsNumber, setLastOsNumber] = React.useState()
     const toastRef = React.useRef()
 
-    const { isAdmin } = useAuthCtx()
+    // const { isAdmin } = useAuthCtx()
 
     const { os } = props.match.params
 
@@ -55,7 +55,6 @@ function OsPage(props) {
         checkForLastOsNumber()
     }, [])
 
-    // const rootNotAdmin = React.useMemo(() => !isAdmin && !os, [isAdmin, os])
     return (
         <>
             <Toast ref={toastRef} />
@@ -64,11 +63,13 @@ function OsPage(props) {
 
             {!!os && <div className="p-mt-2"></div>}
 
-            <OSList
+            { <OSList
                 onOSSelect={(os) => {
-                    isAdmin ? setSelected(os) : props.history.push(`/os/${os.osNumber}`)
+                    setSelected(os)
+                    // isAdmin ? setSelected(os) : props.history.push(`/os/${os.osNumber}`)
                 }}
-            />
+            />}
+
         </>
     );
 }

@@ -10,6 +10,7 @@ export const CONSTS = {
         }
     },
     PERMISSIONS: {
-        private: 'private'
+        private: 'private',
+        available: 'available'
     }
 }

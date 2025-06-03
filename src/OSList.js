@@ -12,6 +12,7 @@ import { CONSTS } from './helpers/constants';
 export const OSList = withRouter((props) => {
   const toastRef = useToastContext()
 
+  const [expandedRows, setExpandedRows] = React.useState()
   const [data, setData] = React.useState()
   const searchRef = React.useRef()
   const { os } = props.match.params
@@ -46,6 +47,15 @@ export const OSList = withRouter((props) => {
   let msgText = 'Digite no campo acima e clique enter para filtrar.'
   if ((searchRef.current && searchRef.current.element.value) || (data && !data.length && !!os)) msgText = 'Nenhum dado encontrado.'
   else if (!data && !!os) msgText = 'Carregando...'
+  
+  const rowExpansionTemplate = (data) => {
+    console.log('rowExpansionTemplate', data)
+    return (
+        <div className="p-3">
+            <h5>Orders for {data}</h5>
+        </div>
+    );
+};
 
   return (
     <div className='p-d-flex p-flex-column'>
@@ -65,10 +75,14 @@ export const OSList = withRouter((props) => {
         !!data && data.length ?
           <div className="card">
             {/* <DataTable value={data} selection={selected} onSelectionChange={e => this.setState({ selectedProduct1: e.value })} selectionMode="single"> */}
-            <DataTable value={data} onSelectionChange={e => {
-              props.onOSSelect(e.value)
-              // props.history.push(`/os/${e.value.osNumber}`)
-              }} selectionMode="single">
+            <DataTable value={data} 
+            expandedRows={expandedRows} onRowToggle={(e) => setExpandedRows(e.data)} 
+            rowExpansionTemplate={rowExpansionTemplate}
+            // onSelectionChange={e => {
+            //   props.onOSSelect(e.value)
+            //   // props.history.push(`/os/${e.value.osNumber}`)
+            //   }} 
+              selectionMode="single">
               <Column field="osNumber" header="OS"></Column>
               <Column field="name" header="Nome"></Column>
               <Column field="phone" header="Telefone"></Column>

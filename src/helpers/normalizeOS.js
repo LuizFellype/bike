@@ -1,4 +1,3 @@
-import { mergeDeepWith, concat } from 'ramda'
 
 export const normalizePhone = (phone, removeDash = true) => {
     const phoneAsString = `${phone}`
@@ -43,7 +42,7 @@ export const updateItembyIndex = (idx, arr, itemToUpdate) => {
     return arrModified
 }
 
-const getTotalOfValues = (arr = []) => arr.reduce((acc, { value }) => {
+export const getTotalOfValues = (arr = []) => arr.reduce((acc, { value }) => {
     return acc + normalizeCurrency(value)
 }, 0)
 
@@ -51,9 +50,6 @@ export const formatServicesAndPecasToReport = (services = [], pecas = []) => {
     const servicesTotal = getTotalOfValues(services)
     const pecasTotal = getTotalOfValues(pecas)
 
-    const pecasNormalized = pecas.map(({ value, ...item }) => ({ ...item, pecaValue: value }))
 
-    const allTogether = Object.values(mergeDeepWith(concat, services, pecasNormalized))
-
-    return { data: allTogether, services: servicesTotal, pecas: pecasTotal, total: servicesTotal + pecasTotal }
+    return { services: servicesTotal, pecas: pecasTotal, total: servicesTotal + pecasTotal }
 }

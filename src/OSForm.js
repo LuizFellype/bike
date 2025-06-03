@@ -54,12 +54,15 @@ const OSForm = props => {
     }, [props.selected])
 
     const isUpdating = !!props.selected
+    
     const servicesTotalAmount = services.reduce((acc, { value }) => {
         return acc + normalizeCurrency(value)
     }, 0)
     const pecasTotalAmount = pecas.reduce((acc, { value }) => {
         return acc + normalizeCurrency(value)
     }, 0)
+
+    const total = pecasTotalAmount + servicesTotalAmount
 
     const handleForm = (e) => {
         e.preventDefault()
@@ -69,7 +72,7 @@ const OSForm = props => {
             services: cleanServicesAndPecas(services, 'service'),
             pecas: cleanServicesAndPecas(pecas, 'peca'),
             color: colorRef.current.element.value,
-            value: valueRef.current.inputEl.value,
+            value: total,
             date: !!date ? new Date(date).getTime() : new Date().getTime(),
             extraInfo,
         }
@@ -219,7 +222,7 @@ const OSForm = props => {
 
                         <div className="p-field p-col-6 p-md-4 p-text-center" style={{ fontSize: '1.25rem' }}>
                             <h3 className='p-mt-1 p-mb-2'>Total</h3>
-                            <span>R$ {servicesTotalAmount + pecasTotalAmount}</span>
+                            <span>R$ {total}</span>
                         </div>
                     </div>
 

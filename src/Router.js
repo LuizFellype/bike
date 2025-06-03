@@ -9,7 +9,7 @@ import Authentication from './components/Authentication'
 import { CONSTS } from './helpers/constants'
 
 const customHistory = createHashHistory();
-const PrivateRoute = ({auth, ...props}) => {
+const AuthRoute = ({auth, ...props}) => {
     return (
         <Authentication auth={auth}>
             <Route {...props} />
@@ -23,9 +23,10 @@ export default function Router() {
             <ToastContextProvider>
                 <DomRouter history={customHistory}>
                     <Switch>
-                        <PrivateRoute exact path='/admin' auth={CONSTS.PERMISSIONS.private} component={AdminPage} />
-                        <PrivateRoute exact path='/' component={OsPage} auth={CONSTS.PERMISSIONS.private} />
-                        <PrivateRoute exact path={'/os/:os'} component={OsPage} />
+                        <AuthRoute exact path='/admin' auth={CONSTS.PERMISSIONS.private} component={AdminPage} />
+                        <AuthRoute exact path='/' component={OsPage} auth={CONSTS.PERMISSIONS.private} />
+                        <AuthRoute exact path={'/os/:os'} component={OsPage} auth={CONSTS.PERMISSIONS.available} />
+                        {/* <Route exact path={'/os/:os'} component={OsPage} /> */}
                         <Route path="*" >
                             <Redirect to='/' />
                         </Route>
