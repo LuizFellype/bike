@@ -13,7 +13,7 @@ export const UserExtraInfo = (props) => {
 
     return <>
         <div className="p-field p-col-2 p-md-1 p-d-flex p-jc-center p-ai-end">
-            <Button type='button' onClick={() => setIsOn(!isOn)} tooltip={isOn ? 'Esconder  informação extra' : 'Mostrar informação extra'} icon={`pi ${isOn ? 'pi-eye-slash' : 'pi-eye'}`}  tooltipOptions={{position: 'bottom'}} className="p-button-rounded p-button-outlined" />
+            <Button type='button' onClick={() => setIsOn(!isOn)} tooltip={isOn ? 'Esconder email e cep' : 'Mostrar email e cep'} icon={`pi ${isOn ? 'pi-eye-slash' : 'pi-eye'}`}  tooltipOptions={{position: 'bottom'}} className="p-button-rounded p-button-outlined" />
         </div>
         
         {

@@ -14,19 +14,26 @@ import copy from 'clipboard-copy';
 import { useToastContext } from './hooks/ToastContext';
 import { UserExtraInfo } from './components/UserExtraInfo';
 
+const initialStates = {
+    services: [{ service: 'Revisão geral', value: '150,00' }],
+    pecas: [{ peca: 'Corrente', value: '100,00' }]
+}
 const OSForm = props => {
     const toastRef = useToastContext()
     const [extraInfo, setExtraInfo] = React.useState({})
     const [date, setDate] = React.useState(() => new Date())
     const [phone, setPhone] = React.useState('')
-    const [services, setServices] = React.useState([{ service: 'Revisão geral', value: '150,00' }])
-    const [pecas, setPecas] = React.useState([{ peca: 'Corrente', value: '100,00' }])
+    const [services, setServices] = React.useState(initialStates.services)
+    const [pecas, setPecas] = React.useState(initialStates.pecas)
     const nameRef = React.useRef()
     const servicesRef = React.useRef(null)
     const valueRef = React.useRef(null)
     const pecasRef = React.useRef(null)
     const pecasValueRef = React.useRef(null)
     const colorRef = React.useRef(null)
+    const hasUpdatedStatefullFieldsRef = React.useRef(false)
+
+    const isUpdating = React.useMemo(() => !!props.selected, [props.selected])
 
     // pre-populate inputs  
     React.useEffect(() => {
@@ -53,8 +60,14 @@ const OSForm = props => {
         }
     }, [props.selected])
 
-    const isUpdating = !!props.selected
-    
+    const trackChangeWrapper = (cb) => (params) => {
+        if (isUpdating) {
+            hasUpdatedStatefullFieldsRef.current = true
+        }
+
+        cb(params)
+    }
+
     const servicesTotalAmount = services.reduce((acc, { value }) => {
         return acc + normalizeCurrency(value)
     }, 0)
@@ -77,19 +90,35 @@ const OSForm = props => {
             extraInfo,
         }
 
-        isUpdating ? props.onSubmit({ ...props.selected, ...formValues }, props.selected.id) : props.onSubmit(formValues)
+        const hasRefsChanged = nameRef.current.element.value !== props.selected.name ||
+            colorRef.current.element.value !== props.selected.color
+        debugger
+
+        if (isUpdating) {
+            if (hasUpdatedStatefullFieldsRef.current || hasRefsChanged) {
+                props.onSubmit({ ...props.selected, ...formValues }, props.selected.id)
+                hasUpdatedStatefullFieldsRef.current = false
+            }
+        } else {
+            props.onSubmit(formValues)
+        }
     }
+
+    const setServiceWrapper = trackChangeWrapper(setServices)
+    const setPecasWrapper = trackChangeWrapper(setPecas)
 
     const handleAddServiceAndPecas = (isPecas) => {
         if (isPecas) {
-            setPecas([
+            setPecasWrapper([
                 ...pecas,
                 { peca: pecasRef.current.element.value, value: pecasValueRef.current.inputEl.value }
             ])
+
             pecasRef.current.element.value = ''
             pecasValueRef.current.inputEl.value = ''
         } else {
-            setServices([
+
+            setServiceWrapper([
                 ...services,
                 { service: servicesRef.current.element.value, value: valueRef.current.inputEl.value }
             ])
@@ -101,11 +130,21 @@ const OSForm = props => {
     const handleExtraInfoChange = React.useCallback((e) => {
         const { id, value } = e.currentTarget
 
-        setExtraInfo({ ...extraInfo, [id]: value })
+        trackChangeWrapper(setExtraInfo)({ ...extraInfo, [id]: value })
     }, [extraInfo])
 
     if (props.viewOnly && !props.selected) return <></>
 
+    const handleCancelToggle = () => {
+        nameRef.current.element.value = ''
+        setPhone('')
+        colorRef.current.element.value = ''
+        setServices(initialStates.services)
+        setPecas(initialStates.pecas)
+
+        props.onCancel()
+    }
+    
     return (
         <Card>
             {
@@ -135,7 +174,7 @@ const OSForm = props => {
                                     return <div className='p-d-flex p-mb-1' key={idx}>
                                         <InputTextarea disabled={props.viewOnly} id="services" type="text" rows="2" autoResize placeholder="ex.: Revisão geral, Pedal e Pastilhas." value={service} onChange={(e) => {
                                             const valuesUpdated = updateItembyIndex(idx, services, { service: e.currentTarget.value, value })
-                                            setServices(valuesUpdated)
+                                            setServiceWrapper(valuesUpdated)
                                         }} />
 
                                         <div className="p-inputgroup p-ml-2 mw-200">
@@ -147,7 +186,7 @@ const OSForm = props => {
                                                     const value = normalizeCurrency(e.value, true)
                                                     const valuesUpdated = updateItembyIndex(idx, services, { service, value })
                                                     // console.log('value --', `${value}`)
-                                                    setServices(valuesUpdated)
+                                                    setServiceWrapper(valuesUpdated)
                                                 }} />
                                                 <label htmlFor="inputgroup" />
                                             </span>
@@ -178,7 +217,7 @@ const OSForm = props => {
                                         <InputTextarea disabled={props.viewOnly} id="pecas" type="text" rows="2" autoResize placeholder="ex.: Pedal, Corrente ..." value={peca} onChange={(e) => {
                                             const valuesUpdated = updateItembyIndex(idx, pecas, { peca: e.currentTarget.value, value })
 
-                                            setPecas(valuesUpdated)
+                                            setPecasWrapper(valuesUpdated)
                                         }} />
 
                                         <div className="p-inputgroup p-ml-2 mw-200">
@@ -189,7 +228,7 @@ const OSForm = props => {
                                                 <InputNumber disabled={props.viewOnly} id="value" mode="decimal" minFractionDigits={2} maxFractionDigits={2} value={normalizeCurrency(value)} onChange={(e) => {
                                                     const value = normalizeCurrency(e.value, true)
                                                     const valuesUpdated = updateItembyIndex(idx, services, { peca, value })
-                                                    setPecas(valuesUpdated)
+                                                    setPecasWrapper(valuesUpdated)
                                                 }} />
                                                 <label htmlFor="inputgroup" />
                                             </span>
@@ -246,7 +285,7 @@ const OSForm = props => {
                         }} type='button' className="p-button-outlined p-button-primary button-sm" />}
 
                         <div className={`${props.viewOnly ? 'd-p-none' : 'p-d-flex'}`} >
-                            <Button label='Cancelar' onClick={props.onCancel} type='button' className="p-button-outlined p-button-secondary p-ml-1 button-sm" />
+                            <Button label='Cancelar' onClick={handleCancelToggle} type='button' className="p-button-outlined p-button-secondary p-ml-1 button-sm" />
                             <Button type='submit' label={isUpdating ? 'Atualizar' : 'Salvar'} className="p-button-success p-ml-1 button-sm" />
                         </div>
                     </div >
