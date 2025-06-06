@@ -131,6 +131,7 @@ const OSForm = props => {
         const { id, value } = e.currentTarget
 
         trackChangeWrapper(setExtraInfo)({ ...extraInfo, [id]: value })
+       // eslint-disable-next-line 
     }, [extraInfo])
 
     if (props.viewOnly && !props.selected) return <></>
