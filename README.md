@@ -1,5 +1,15 @@
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
+REACT_APP_apiKey=<FROM_FIREBASE>,
+REACT_APP_authDomain=<FROM_FIREBASE>,
+REACT_APP_databaseURL=<FROM_FIREBASE>,
+REACT_APP_projectId=<FROM_FIREBASE>,
+REACT_APP_storageBucket=<FROM_FIREBASE>,
+REACT_APP_messagingSenderId=<FROM_FIREBASE>,
+REACT_APP_appId=<FROM_FIREBASE>,
+REACT_APP_measurementId=<FROM_FIREBASE>
+
+
 ## Available Scripts
 
 In the project directory, you can run:
