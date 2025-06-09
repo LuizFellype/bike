@@ -150,7 +150,7 @@ const OSForm = props => {
         <Card className='os-form-wrapper'>
             {
                 props.selected && <div className='p-d-flex p-jc-end'>
-                    <span className="p-tag p-tag-rounded">OS SELECIONADA: <b>{isUpdating && props.selected.osNumber}</b></span>
+                    <span className="p-tag p-tag-rounded themed-button p-py-1 p-px-3">OS SELECIONADA: <b>{isUpdating && props.selected.osNumber}</b></span>
                 </div>
             }
             <form id="react-no-print" onSubmit={handleForm}>

@@ -20,7 +20,7 @@
 .header {
   border-radius: 10px 10px 0 0;
   background: #302e31;
-  /* box-shadow: 0 2px 1px -1px #302e3150, 0 1px 1px 0 #302e3150; */
+  box-shadow: 0 2px 1px -1px #302e3150, 0 1px 1px 0 #302e3150;
   align-items: center;
   padding: 0 10px;
   margin-bottom: 0.15rem
@@ -33,6 +33,11 @@
   box-shadow: 0 1px 1px -1px #302e3142, 0 0px 1px 0 #302e3145, 0 1px 1px 0 #302e3150;
 }
 
+.p-tag.themed-button {
+  color: #e0b605;
+  background: #302e31;
+  font-weight: 400;
+}
 .p-button.themed-button {
   color: #e0b605;
 }
