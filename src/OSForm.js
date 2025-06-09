@@ -147,7 +147,7 @@ const OSForm = props => {
     }
     
     return (
-        <Card>
+        <Card className='os-form-wrapper'>
             {
                 props.selected && <div className='p-d-flex p-jc-end'>
                     <span className="p-tag p-tag-rounded">OS SELECIONADA: <b>{isUpdating && props.selected.osNumber}</b></span>

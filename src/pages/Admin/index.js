@@ -7,6 +7,7 @@ import './index.css'
 import { getOSFromDate } from '../../services/client';
 import { formatServicesAndPecasToReport } from '../../helpers/normalizeOS';
 import { SelectButton } from 'primereact/selectbutton';
+import { Button } from 'primereact/button';
 
 const filterOptionsValues = {
     Semanal: 'Semanal',
@@ -47,16 +48,17 @@ const getDateFromTM = (TMDate = new Date().getTime()) => {
     return dateFormated
 }
 
-const AdminPage = () => {
+const AdminPage = (props) => {
     const [loading, setLoading] = React.useState(true)
     const [rawData, setRawData] = React.useState()
     const [totals, setTotals] = React.useState()
     const [dateFilter, setDateFilter] = React.useState()
     const [filter, setFilter] = React.useState(filterOptionsValues.Mensal)
 
+
     const getAllOSFromLastDate = (date) => {
         !loading && setLoading(true)
-        
+
         getOSFromDate(date).then((data = []) => {
             const { services, pecas } = data.reduce((acc, item) => {
                 const pecasToSpreed = item.pecas || []
@@ -122,11 +124,23 @@ const AdminPage = () => {
     const [expandedRows, setExpandedRows] = React.useState()
     const rowExpansionTemplate = (data) => {
         const servicesAndPecas = [...data.services, ...data.pecas]
+        const headerTitle = `${data.name} - ${data.phone} - ${getDateFromTM(data.date)}`
+
+        const header = <div className='p-d-flex p-align-center os-header'>
+            <span className='p-mr-1'>{headerTitle}</span>
+            <Button
+                onClick={() => props.history?.push(`/os/${data.osNumber}`)}
+                icon='pi pi-pencil'
+                tooltip='Editar OS' 
+                className='p-button-outlined themed-button' 
+                size="small" 
+            />
+        </div>
 
         return (
             <div className="p-3">
                 <DataTable
-                    header={`${data.name} - ${data.phone} - ${getDateFromTM(data.date)}`}
+                    header={header}
                     value={servicesAndPecas}
                     emptyMessage='Nenhuma OS encontrada essa semana.'
                     className='datatable-responsive-demo'
@@ -151,7 +165,7 @@ const AdminPage = () => {
                 }}
                 rowExpansionTemplate={rowExpansionTemplate}
             >
-                <Column expander style={{ width: '2rem' }} />
+                <Column expander style={{ width: '2.2rem' }} />
 
                 <Column field="osNumber" header="OS #" ></Column>
                 <Column field="totalServices" header="Services" ></Column>
