@@ -90,13 +90,13 @@ const OSForm = props => {
             extraInfo,
         }
 
-        const hasRefsChanged = nameRef.current.element.value !== props.selected.name ||
-            colorRef.current.element.value !== props.selected.color
+        const hasRefsChanged = nameRef.current.element.value !== props.selected?.name ||
+            colorRef.current.element.value !== props.selected?.color
         debugger
 
         if (isUpdating) {
             if (hasUpdatedStatefullFieldsRef.current || hasRefsChanged) {
-                props.onSubmit({ ...props.selected, ...formValues }, props.selected.id)
+                props.onSubmit({ ...props.selected, ...formValues }, props.selected?.id)
                 hasUpdatedStatefullFieldsRef.current = false
             }
         } else {
