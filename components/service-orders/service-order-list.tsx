@@ -8,15 +8,33 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Search, Edit, Eye, Trash2 } from "lucide-react"
 import { useServiceOrders, useDeleteServiceOrder } from "@/hooks/use-service-orders"
-import type { ServiceOrderFilter } from "@/lib/graphql-client"
+import { ServiceOrderStatus, type ServiceOrderFilter } from "@/lib/graphql-client"
 import Link from "next/link"
+import { StatusFilter } from "../ui/status-filter"
 
+const getDaysFromNow = (daysDiff: number) => {
+  const today = new Date()
+  const lastWeek = new Date(today)
+  lastWeek.setDate(today.getDate() + daysDiff)
+
+  return lastWeek.toISOString().split("T")[0] // format as YYYY-MM-DD
+}
+
+const getInitialStates = () => {
+  return {
+    dateFrom: getDaysFromNow(-7),
+    dateTo: getDaysFromNow(1),
+    status: [ServiceOrderStatus.WAITING, ServiceOrderStatus.WIP],
+  }
+}
 export function ServiceOrderList() {
-  const [filters, setFilters] = useState<ServiceOrderFilter>({})
+  const [filters, setFilters] = useState<ServiceOrderFilter>(getInitialStates)
+
+  const [status, setStatus] = useState(filters.status!)
   const [searchId, setSearchId] = useState("")
   const [searchPhone, setSearchPhone] = useState("")
-  const [dateFrom, setDateFrom] = useState("")
-  const [dateTo, setDateTo] = useState("")
+  const [dateFrom, setDateFrom] = useState(filters.dateFrom)
+  const [dateTo, setDateTo] = useState(filters.dateTo)
 
   const { data: serviceOrders = [], isLoading, error } = useServiceOrders(filters)
 
@@ -28,6 +46,7 @@ export function ServiceOrderList() {
     if (searchPhone.trim()) newFilters.phone = searchPhone.trim()
     if (dateFrom) newFilters.dateFrom = dateFrom
     if (dateTo) newFilters.dateTo = dateTo
+    if (status) newFilters.status = status
 
     setFilters(newFilters)
   }
@@ -168,6 +187,7 @@ export function ServiceOrderList() {
                 className="border-slate-300 focus:border-blue-500"
               />
             </div>
+
             <div className="space-y-2">
               <Label htmlFor="date-from">Date From</Label>
               <Input
@@ -188,15 +208,20 @@ export function ServiceOrderList() {
                 className="border-slate-300 focus:border-blue-500"
               />
             </div>
+
           </div>
-          <div className="flex gap-2 mt-4">
-            <Button onClick={handleSearch} className="bg-blue-600 hover:bg-blue-700">
-              <Search className="h-4 w-4 mr-2" />
-              Search
-            </Button>
-            <Button onClick={handleClearFilters} variant="outline">
-              Clear Filters
-            </Button>
+          <div className="flex justify-between items-center mt-4">
+            <StatusFilter selectedStatuses={status} onStatusChange={setStatus} />
+            
+            <div>
+              <Button onClick={handleSearch} className="bg-blue-600 hover:bg-blue-700">
+                <Search className="h-4 w-4 mr-2" />
+                Search
+              </Button>
+              <Button onClick={handleClearFilters} variant="outline">
+                Clear Filters
+              </Button>
+            </div>
           </div>
         </CardContent>
       </Card>

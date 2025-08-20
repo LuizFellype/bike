@@ -26,14 +26,15 @@ export const apolloClient = new ApolloClient({
 
 // GraphQL Queries and Mutations
 export const GET_SERVICE_ORDERS = gql`
-  query GetServiceOrders {
-    serviceOrders {
+  query GetServiceOrders($filter: serviceOrders_bool_exp) {
+    serviceOrders(where: $filter) {
       id
       name
       phone
       description
       services_list
       totalAmount
+      status
       created_at
       updated_at
     }
@@ -50,6 +51,7 @@ export const GET_SERVICE_ORDER_BY_WHERE = gql`
       description
       services_list
       totalAmount
+      status
       created_at
       updated_at
     }
@@ -65,6 +67,7 @@ export const CREATE_SERVICE_ORDER = gql`
       description
       services_list
       totalAmount
+      status
       created_at
       updated_at
     }
@@ -80,6 +83,7 @@ export const UPDATE_SERVICE_ORDER = gql`
         description
         services_list
         totalAmount
+        status
         created_at
         updated_at
     }
@@ -102,6 +106,13 @@ export interface ServiceOrderService {
   price: number
 }
 
+// create enum "waiting" | "wip" | "done"
+export enum ServiceOrderStatus {
+  WAITING = "waiting",
+  WIP = "wip",
+  DONE = "done",
+}
+
 export interface ServiceOrder {
   id: string
   name: string
@@ -110,6 +121,7 @@ export interface ServiceOrder {
   services?: ServiceOrderService[]
   services_list?: string
   totalAmount: number
+  status: ServiceOrderStatus
   created_at: string
   updated_at: string
 }
@@ -119,6 +131,7 @@ export interface ServiceOrderFilter {
   phone?: string
   dateFrom?: string
   dateTo?: string
+  status?: ServiceOrderStatus[]
 }
 
 export interface CreateServiceOrderInput {

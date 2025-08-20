@@ -6,6 +6,7 @@ import {
   CREATE_SERVICE_ORDER,
   UPDATE_SERVICE_ORDER,
   DELETE_SERVICE_ORDER,
+  ServiceOrderStatus,
 } from "@/lib/graphql-client"
 import type {
   ServiceOrder,
@@ -34,7 +35,14 @@ const normalizeWriting = normalizeServicesOrder(true)
 
 
 // Hook for fetching all service orders with optional filtering
-export function useServiceOrders(filter?: ServiceOrderFilter) {
+export function useServiceOrders(filterParams: ServiceOrderFilter = {}) {
+  const filter = { 
+    status: { _in: filterParams.status || [ServiceOrderStatus.WIP, ServiceOrderStatus.WAITING] },
+    id: filterParams.id ? { _eq: filterParams.id } : undefined,
+    phone: filterParams.phone ? { _eq: filterParams.phone } : undefined,
+    created_at: (filterParams.dateFrom || filterParams.dateTo) ? { _gte: filterParams.dateFrom, _lte: filterParams.dateTo } : undefined 
+  } as any
+  
   return useQuery({
     queryKey: ["serviceOrders", filter],
     queryFn: async () => {
