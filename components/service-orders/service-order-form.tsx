@@ -99,11 +99,18 @@ export function ServiceOrderForm({ serviceOrder, onSave, onCancel }: ServiceOrde
   }
 
   const handleCancel = () => {
+    if (isEditing) {
+      setName(serviceOrder?.name || "")
+      setPhone(serviceOrder?.phone || "")
+      setDescription(serviceOrder?.description || "")
+      setServices(serviceOrder.services || JSON.parse(serviceOrder.services_list || "") || [{ description: "", price: 0 }])
+    }
+
     setName("")
     setPhone("")
-    // setDate(new Date().toISOString().split("T")[0])
     setDescription("")
     setServices([{ description: "", price: 0 }])
+    
     onCancel?.()
   }
 

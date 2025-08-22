@@ -34,12 +34,16 @@ const normalizeWriting = normalizeServicesOrder(true)
 
 
 
+type ServiceOrdersPaginationResult = {
+  serviceOrders: ServiceOrder[]
+  totalCount: number
+}
 // Hook for fetching all service orders with optional filtering
 export function useServiceOrders(filterParams: ServiceOrderFilter) {
   const limit = filterParams.limit || 15
   const offset = (filterParams.page ? (filterParams.page - 1) * limit : 0)
 
-  const filter = { 
+  const filter = {
     status: { _in: filterParams.status || [ServiceOrderStatus.WIP, ServiceOrderStatus.WAITING] },
     id: filterParams.id ? { _eq: filterParams.id } : undefined,
     phone: filterParams.phone ? { _eq: filterParams.phone } : undefined,
@@ -47,7 +51,7 @@ export function useServiceOrders(filterParams: ServiceOrderFilter) {
   } as any
 
   const filterKey = { ...filter, limit, offset }
-  
+
   return useQuery({
     queryKey: ["serviceOrders", filterKey],
     queryFn: async () => {
@@ -83,18 +87,16 @@ export function useServiceOrder(params: WhereParams) {
         queryKey: ["serviceOrders"],
       })
 
-    const filteredCachedSO = allQueries.reduce((acc, queryInfo) => {
-      const fetchedQuery = queryInfo?.[1] as unknown as ServiceOrder[]
-      const filteredByKey = fetchedQuery?.filter(so => so[params.key] === Number(params.value))
+    let filteredByKey;
+    allQueries.find((queryInfo) => {
+      const fetchedQuery = queryInfo?.[1] as unknown as ServiceOrdersPaginationResult
+      
+      filteredByKey = fetchedQuery?.serviceOrders.find(so => so[params.key] === Number(params.value))
 
-      if (!filteredByKey) return acc
+      return !!filteredByKey
+    })
 
-      return [...acc, ...filteredByKey]
-    }, [] as ServiceOrder[])
-
-    if (filteredCachedSO[0]) {
-      cachedItem = filteredCachedSO[0]
-    }
+    cachedItem = filteredByKey
   }
 
   const whereInput = normalizeWhereInput(params)
@@ -108,7 +110,7 @@ export function useServiceOrder(params: WhereParams) {
         query: GET_SERVICE_ORDER_BY_WHERE,
         variables: { whereInput },
       })
-      
+
       return normalizeReading(result.data.serviceOrders[0]) as ServiceOrder
     },
     enabled: !!params.value,
@@ -129,7 +131,7 @@ export function useCreateServiceOrder() {
         mutation: CREATE_SERVICE_ORDER,
         variables: { input },
       })
-      
+
       return normalizeReading(result.data.insert_serviceOrders_one)
     },
     onSuccess: (newServiceOrder) => {
