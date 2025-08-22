@@ -21,12 +21,8 @@ import { ApolloQueryResult, OperationVariables, QueryOptions } from "@apollo/cli
 import { normalizeServicesOrder } from "@/lib/data-normalizations"
 
 
-
-
 const normalizeReading = normalizeServicesOrder(false)
 const normalizeWriting = normalizeServicesOrder(true)
-
-
 
 type ServiceOrdersPaginationResult = {
   serviceOrders: ServiceOrder[]
@@ -61,6 +57,7 @@ export function useServiceOrders(filterParams: ServiceOrderFilter, isDashboard =
   })
 }
 
+
 export type WhereParams = { key: keyof ServiceOrder, value: string | number }
 
 const normalizeWhereInput = ({ key, value }: WhereParams) => {
@@ -82,7 +79,7 @@ export function useServiceOrder(params: WhereParams) {
     allQueries.find((queryInfo) => {
       const fetchedQuery = queryInfo?.[1] as unknown as ServiceOrdersPaginationResult
       
-      filteredByKey = fetchedQuery?.serviceOrders.find(so => so[params.key] === Number(params.value))
+      filteredByKey = fetchedQuery?.serviceOrders?.find(so => so[params.key] === Number(params.value))
 
       return !!filteredByKey
     })
