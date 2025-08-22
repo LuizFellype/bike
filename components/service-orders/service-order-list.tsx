@@ -7,10 +7,11 @@ import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Search, Edit, Eye, Trash2 } from "lucide-react"
-import { useServiceOrders, useDeleteServiceOrder } from "@/hooks/use-service-orders"
-import { ServiceOrderStatus, type ServiceOrderFilter } from "@/lib/graphql-client"
+import { useServiceOrders, useDeleteServiceOrder, useUpdateServiceOrder } from "@/hooks/use-service-orders"
+import { ServiceOrder, ServiceOrderStatus, ServiceOrderStatusLabel, type ServiceOrderFilter } from "@/lib/graphql-client"
 import Link from "next/link"
-import { StatusFilter } from "../ui/status-filter"
+import { statusConfig, StatusFilter, StatusToggleController } from "../ui/status-filter"
+import { toast } from "@/hooks/use-toast"
 
 const getDaysFromNow = (daysDiff: number) => {
   const today = new Date()
@@ -39,6 +40,7 @@ export function ServiceOrderList() {
   const { data: serviceOrders = [], isLoading, error } = useServiceOrders(filters)
 
   const deleteMutation = useDeleteServiceOrder(filters)
+  const updateMutation = useUpdateServiceOrder()
 
   const handleSearch = () => {
     const newFilters: ServiceOrderFilter = {}
@@ -57,6 +59,25 @@ export function ServiceOrderList() {
     setDateFrom("")
     setDateTo("")
     setFilters({})
+  }
+
+  const handleStatusToggle = async (id: ServiceOrder['id'], updatedStatus: ServiceOrder['status']) => {
+    try {
+      await updateMutation.mutateAsync({
+        id: id,
+        input: { status: updatedStatus },
+      })
+      toast({
+        title: `OS (#${id}) está em ${ServiceOrderStatusLabel[updatedStatus]}!`,
+      })
+    } catch (error) {
+      console.error("Error updating service order status:", error)
+      toast({
+        variant: "destructive",
+        title: `Error ao atualizar Ordem de Serviço #${id}!`,
+        description: (error as Error)?.message || "Error desconhecido. Contate o suporte.",
+      })
+    }
   }
 
   const handleDelete = async (id: string) => {
@@ -98,27 +119,36 @@ export function ServiceOrderList() {
       <Card key={order.id} className="hover:shadow-md transition-shadow">
         <CardContent className="p-6">
           <div className="flex justify-between items-start mb-4">
-            <div>
+            <div className="flex gap-2 items-center">
               <h3 className="text-lg font-semibold text-slate-900">SO #{order.id}</h3>
-              <p className="text-slate-600">{order.name}</p>
+              <p className="text-slate-600"> - {order.name}</p>
             </div>
-            <Badge variant="secondary" className="bg-blue-100 text-blue-800">
-              ${order.totalAmount.toFixed(2)}
-            </Badge>
+
+            <StatusToggleController task={order} onMoveTask={handleStatusToggle} >
+              <Badge variant="secondary" className={`${statusConfig[order.status].color} absolute top-[-12px] left-[20%]`} aria-selected>
+                {statusConfig[order.status].label}
+              </Badge>
+            </StatusToggleController>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-            <div>
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4 justify-between">
+            <div className="flex gap-2">
               <span className="text-sm font-medium text-slate-500">Cell:</span>
               <p className="text-slate-900">{order.phone}</p>
             </div>
-            <div>
+            <div className="flex gap-2">
               <span className="text-sm font-medium text-slate-500">Date:</span>
               <p className="text-slate-900">{new Date(order.created_at).toLocaleDateString()}</p>
             </div>
-            <div>
+            <div className="flex gap-2">
               <span className="text-sm font-medium text-slate-500">Services:</span>
               <p className="text-slate-900">{order.services?.length} service(s)</p>
+            </div>
+
+            <div className="text-center">
+              <Badge variant="secondary" className="bg-purple-100 text-blue-800 text-md ml-2">
+                R$ {order.totalAmount.toFixed(2)}
+              </Badge>
             </div>
           </div>
 
@@ -132,14 +162,8 @@ export function ServiceOrderList() {
           <div className="flex gap-2">
             <Link href={`/service-orders/edit/${order.id}`}>
               <Button variant="outline" size="sm">
-                <Eye className="h-4 w-4 mr-1" />
-                View
-              </Button>
-            </Link>
-            <Link href={`/service-orders/edit/${order.id}`}>
-              <Button variant="outline" size="sm">
                 <Edit className="h-4 w-4 mr-1" />
-                Edit
+                View/Edit
               </Button>
             </Link>
             <Button
@@ -212,7 +236,7 @@ export function ServiceOrderList() {
           </div>
           <div className="flex justify-between items-center mt-4">
             <StatusFilter selectedStatuses={status} onStatusChange={setStatus} />
-            
+
             <div>
               <Button onClick={handleSearch} className="bg-blue-600 hover:bg-blue-700">
                 <Search className="h-4 w-4 mr-2" />

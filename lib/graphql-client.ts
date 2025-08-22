@@ -112,6 +112,11 @@ export enum ServiceOrderStatus {
   WIP = "wip",
   DONE = "done",
 }
+export const ServiceOrderStatusLabel = {
+  [ServiceOrderStatus.WAITING]: "Na fila",
+  [ServiceOrderStatus.WIP]: "Em Progresso",
+  [ServiceOrderStatus.DONE]: "Finalizada",
+}
 
 export interface ServiceOrder {
   id: string
@@ -143,9 +148,6 @@ export interface CreateServiceOrderInput {
 }
 
 
-export interface UpdateServiceOrderInput {
-  name?: string
-  phone?: string
-  description?: string
-  services?: ServiceOrderService[]
-}
+type OmitAndMakeRestOptional<T, K extends keyof T> = Partial<Omit<T, K>>;
+
+export type UpdateServiceOrderInput = OmitAndMakeRestOptional<ServiceOrder, 'id' | 'created_at' | 'updated_at'>; 

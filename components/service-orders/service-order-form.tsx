@@ -11,7 +11,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Plus, Trash2 } from "lucide-react"
 import { useCreateServiceOrder, useUpdateServiceOrder } from "@/hooks/use-service-orders"
 import type { ServiceOrder, ServiceOrderService } from "@/lib/graphql-client"
-import { useToast } from "@/hooks/use-toast"
+import { toast } from "@/hooks/use-toast"
 
 interface ServiceOrderFormProps {
   serviceOrder?: ServiceOrder
@@ -23,7 +23,6 @@ export function ServiceOrderForm({ serviceOrder, onSave, onCancel }: ServiceOrde
   const todayDate = new Date().toISOString().split("T")[0]
   const [name, setName] = useState("")
   const [phone, setPhone] = useState("")
-  const {toast} = useToast()
   const [description, setDescription] = useState("")
   const [services, setServices] = useState<ServiceOrderService[]>([{ description: "", price: 0 }])
 
