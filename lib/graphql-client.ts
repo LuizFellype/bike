@@ -1,4 +1,5 @@
-import { ApolloClient, InMemoryCache, createHttpLink, gql } from "@apollo/client"
+import { ApolloClient, ApolloQueryResult, InMemoryCache, createHttpLink, gql } from "@apollo/client"
+import { normalizeServicesOrderList } from "./data-normalizations"
 
 // TODO: Replace with your actual GraphQL endpoint
 const httpLink = createHttpLink({
@@ -25,6 +26,23 @@ export const apolloClient = new ApolloClient({
 })
 
 // GraphQL Queries
+export const queryList = (variables: any) => {
+  const query = {
+    query: GET_SERVICE_ORDERS,
+    variables,
+  }
+
+  const handleResult = (result: ApolloQueryResult<any>) => {
+    return {
+      serviceOrders: normalizeServicesOrderList(result.data?.serviceOrders),
+      totalCount: result.data?.serviceOrders_aggregate.aggregate.count,
+      // totalAmount: result.data?.serviceOrders_aggregate.aggregate.sum.totalAmount,
+    }
+  }
+  
+  return { query, handleResult }
+}
+
 export const GET_SERVICE_ORDERS = gql`
   query GetServiceOrders($whereInput: serviceOrders_bool_exp, $limit: Int, $offset: Int) {
     serviceOrders(where: $whereInput, limit: $limit, offset: $offset) {
@@ -42,6 +60,35 @@ export const GET_SERVICE_ORDERS = gql`
       aggregate {
         count
       }
+    }
+  }
+`
+
+export const queryDashboard = (variables: any) => {
+  const query = {
+    query: GET_DASHBOARD_SERVICE_ORDERS,
+    variables,
+  }
+
+  const handleResult = (result: ApolloQueryResult<any>) => {
+    return {
+      totalCount: result.data?.serviceOrders_aggregate.aggregate.count,
+      totalAmount: result.data?.serviceOrders_aggregate.aggregate.sum.totalAmount,
+    }
+  }
+
+  return { query, handleResult }
+}
+export const GET_DASHBOARD_SERVICE_ORDERS = gql`
+  query GetServiceOrdersForDashboard($whereInput: serviceOrders_bool_exp) {
+    serviceOrders_aggregate(where: $whereInput) {
+      aggregate {
+        count
+        sum {
+          totalAmount
+        }
+      }
+      
     }
   }
 `
@@ -144,8 +191,8 @@ export interface ServiceOrderFilter {
   phone?: string
   dateFrom?: string
   dateTo?: string
-  limit: number
-  page: number
+  limit?: number
+  page?: number
   status?: ServiceOrderStatus[]
 }
 
@@ -161,3 +208,4 @@ export interface CreateServiceOrderInput {
 type OmitAndMakeRestOptional<T, K extends keyof T> = Partial<Omit<T, K>>;
 
 export type UpdateServiceOrderInput = OmitAndMakeRestOptional<ServiceOrder, 'id' | 'created_at' | 'updated_at'>; 
+

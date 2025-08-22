@@ -104,12 +104,13 @@ export function ServiceOrderForm({ serviceOrder, onSave, onCancel }: ServiceOrde
       setPhone(serviceOrder?.phone || "")
       setDescription(serviceOrder?.description || "")
       setServices(serviceOrder.services || JSON.parse(serviceOrder.services_list || "") || [{ description: "", price: 0 }])
+    } else {
+      setName("")
+      setPhone("")
+      setDescription("")
+      setServices([{ description: "", price: 0 }])
     }
 
-    setName("")
-    setPhone("")
-    setDescription("")
-    setServices([{ description: "", price: 0 }])
     
     onCancel?.()
   }

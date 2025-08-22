@@ -75,7 +75,7 @@ export function ServiceOrderList() {
         input: { status: updatedStatus },
       })
       toast({
-        title: `OS (#${id}) está em ${ServiceOrderStatusLabel[updatedStatus]}!`,
+        title: `OS (#${id}) foi ${ServiceOrderStatusLabel[updatedStatus]}!`,
       })
     } catch (error) {
       console.error("Error updating service order status:", error)

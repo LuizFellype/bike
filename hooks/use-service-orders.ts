@@ -7,6 +7,9 @@ import {
   UPDATE_SERVICE_ORDER,
   DELETE_SERVICE_ORDER,
   ServiceOrderStatus,
+  GET_DASHBOARD_SERVICE_ORDERS,
+  queryList,
+  queryDashboard,
 } from "@/lib/graphql-client"
 import type {
   ServiceOrder,
@@ -14,20 +17,11 @@ import type {
   CreateServiceOrderInput,
   UpdateServiceOrderInput,
 } from "@/lib/graphql-client"
+import { ApolloQueryResult, OperationVariables, QueryOptions } from "@apollo/client"
+import { normalizeServicesOrder } from "@/lib/data-normalizations"
 
-const normalizeServicesOrderList = (servicesOrderList: ServiceOrder[], isWriting = false) => {
-  return servicesOrderList.map(normalizeServicesOrder(isWriting))
-}
 
-const normalizeServicesOrder = (isWriting = false) => (serviceOrder: ServiceOrder): ServiceOrder => {
-  if (isWriting) {
-    const { services, ...so } = serviceOrder
-    return { ...so, services_list: JSON.stringify(services || []) }
-  }
 
-  const { services_list, ...so } = serviceOrder
-  return { ...so, services: JSON.parse(services_list || "[]") }
-}
 
 const normalizeReading = normalizeServicesOrder(false)
 const normalizeWriting = normalizeServicesOrder(true)
@@ -39,9 +33,9 @@ type ServiceOrdersPaginationResult = {
   totalCount: number
 }
 // Hook for fetching all service orders with optional filtering
-export function useServiceOrders(filterParams: ServiceOrderFilter) {
-  const limit = filterParams.limit || 15
-  const offset = (filterParams.page ? (filterParams.page - 1) * limit : 0)
+export function useServiceOrders(filterParams: ServiceOrderFilter, isDashboard = false) {
+  const limit = filterParams.limit
+  const offset = !!limit ? (filterParams.page ? (filterParams.page - 1) * limit : 0) : 0
 
   const filter = {
     status: { _in: filterParams.status || [ServiceOrderStatus.WIP, ServiceOrderStatus.WAITING] },
@@ -52,20 +46,17 @@ export function useServiceOrders(filterParams: ServiceOrderFilter) {
 
   const filterKey = { ...filter, limit, offset }
 
+  const queryFnBuilder = (query: QueryOptions<OperationVariables, any>, handleResult: (arg0: ApolloQueryResult<any>) => any) => async () => {
+    const result = await apolloClient.query(query)
+
+    return handleResult(result)
+  }
+
+  const { query, handleResult } = isDashboard ? queryDashboard({ whereInput: filter }) : queryList({ whereInput: filter, limit, offset }) 
+
   return useQuery({
     queryKey: ["serviceOrders", filterKey],
-    queryFn: async () => {
-      const result = await apolloClient.query({
-        query: GET_SERVICE_ORDERS,
-        variables: { whereInput: filter, limit, offset },
-      })
-
-      return {
-        serviceOrders: normalizeServicesOrderList(result.data?.serviceOrders),
-        totalCount: result.data.serviceOrders_aggregate.aggregate.count,
-      }
-    },
-
+    queryFn: queryFnBuilder(query, handleResult),
     staleTime: 5 * 60 * 1000, // 5 minutes
   })
 }
