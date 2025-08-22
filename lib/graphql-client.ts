@@ -24,10 +24,10 @@ export const apolloClient = new ApolloClient({
   },
 })
 
-// GraphQL Queries and Mutations
+// GraphQL Queries
 export const GET_SERVICE_ORDERS = gql`
-  query GetServiceOrders($filter: serviceOrders_bool_exp) {
-    serviceOrders(where: $filter) {
+  query GetServiceOrders($whereInput: serviceOrders_bool_exp, $limit: Int, $offset: Int) {
+    serviceOrders(where: $whereInput, limit: $limit, offset: $offset) {
       id
       name
       phone
@@ -38,10 +38,14 @@ export const GET_SERVICE_ORDERS = gql`
       created_at
       updated_at
     }
+    serviceOrders_aggregate(where: $whereInput) {
+      aggregate {
+        count
+      }
+    }
   }
 `
 
-// { [property]: { _eq: <value> } }
 export const GET_SERVICE_ORDER_BY_WHERE = gql`
   query GetServiceOrderByWhere($whereInput: serviceOrders_bool_exp) {
     serviceOrders(where: $whereInput) {
@@ -57,6 +61,10 @@ export const GET_SERVICE_ORDER_BY_WHERE = gql`
     }
   }
 `
+
+
+
+// GraphQL Mutations
 
 export const CREATE_SERVICE_ORDER = gql`
   mutation CreateServiceOrder($input: serviceOrders_insert_input!) {
@@ -136,6 +144,8 @@ export interface ServiceOrderFilter {
   phone?: string
   dateFrom?: string
   dateTo?: string
+  limit: number
+  page: number
   status?: ServiceOrderStatus[]
 }
 

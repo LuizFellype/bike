@@ -35,23 +35,31 @@ const normalizeWriting = normalizeServicesOrder(true)
 
 
 // Hook for fetching all service orders with optional filtering
-export function useServiceOrders(filterParams: ServiceOrderFilter = {}) {
+export function useServiceOrders(filterParams: ServiceOrderFilter) {
+  const limit = filterParams.limit || 15
+  const offset = (filterParams.page ? (filterParams.page - 1) * limit : 0)
+
   const filter = { 
     status: { _in: filterParams.status || [ServiceOrderStatus.WIP, ServiceOrderStatus.WAITING] },
     id: filterParams.id ? { _eq: filterParams.id } : undefined,
     phone: filterParams.phone ? { _eq: filterParams.phone } : undefined,
-    created_at: (filterParams.dateFrom || filterParams.dateTo) ? { _gte: filterParams.dateFrom, _lte: filterParams.dateTo } : undefined 
+    created_at: (filterParams.dateFrom || filterParams.dateTo) ? { _gte: filterParams.dateFrom, _lte: filterParams.dateTo } : undefined,
   } as any
+
+  const filterKey = { ...filter, limit, offset }
   
   return useQuery({
-    queryKey: ["serviceOrders", filter],
+    queryKey: ["serviceOrders", filterKey],
     queryFn: async () => {
       const result = await apolloClient.query({
         query: GET_SERVICE_ORDERS,
-        variables: { filter },
+        variables: { whereInput: filter, limit, offset },
       })
 
-      return normalizeServicesOrderList(result.data.serviceOrders)
+      return {
+        serviceOrders: normalizeServicesOrderList(result.data?.serviceOrders),
+        totalCount: result.data.serviceOrders_aggregate.aggregate.count,
+      }
     },
 
     staleTime: 5 * 60 * 1000, // 5 minutes

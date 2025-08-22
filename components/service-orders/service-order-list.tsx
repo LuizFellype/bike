@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Search, Edit, Eye, Trash2 } from "lucide-react"
+import { Search, Edit, Eye, Trash2, ChevronLeft, ChevronRight } from "lucide-react"
 import { useServiceOrders, useDeleteServiceOrder, useUpdateServiceOrder } from "@/hooks/use-service-orders"
 import { ServiceOrder, ServiceOrderStatus, ServiceOrderStatusLabel, type ServiceOrderFilter } from "@/lib/graphql-client"
 import Link from "next/link"
@@ -21,8 +21,14 @@ const getDaysFromNow = (daysDiff: number) => {
   return lastWeek.toISOString().split("T")[0] // format as YYYY-MM-DD
 }
 
+const DEFAULT_PAGINATION = {
+  limit: 15,
+  page: 1,
+}
+
 const getInitialStates = () => {
   return {
+    ...DEFAULT_PAGINATION,
     dateFrom: getDaysFromNow(-7),
     dateTo: getDaysFromNow(1),
     status: [ServiceOrderStatus.WAITING, ServiceOrderStatus.WIP],
@@ -37,13 +43,14 @@ export function ServiceOrderList() {
   const [dateFrom, setDateFrom] = useState(filters.dateFrom)
   const [dateTo, setDateTo] = useState(filters.dateTo)
 
-  const { data: serviceOrders = [], isLoading, error } = useServiceOrders(filters)
+  const { data, isLoading, error } = useServiceOrders(filters)
+  const { serviceOrders = [], totalCount } = data || {}
 
   const deleteMutation = useDeleteServiceOrder(filters)
   const updateMutation = useUpdateServiceOrder()
 
   const handleSearch = () => {
-    const newFilters: ServiceOrderFilter = {}
+    const newFilters: ServiceOrderFilter = { page: filters.page, limit: filters.limit }
     if (searchId.trim()) newFilters.id = searchId.trim()
     if (searchPhone.trim()) newFilters.phone = searchPhone.trim()
     if (dateFrom) newFilters.dateFrom = dateFrom
@@ -58,7 +65,7 @@ export function ServiceOrderList() {
     setSearchPhone("")
     setDateFrom("")
     setDateTo("")
-    setFilters({})
+    setFilters(DEFAULT_PAGINATION)
   }
 
   const handleStatusToggle = async (id: ServiceOrder['id'], updatedStatus: ServiceOrder['status']) => {
@@ -97,16 +104,14 @@ export function ServiceOrderList() {
     </div>
   )
 
+  const errorView = !isLoading && error && (
+    <div className="flex justify-center items-center min-h-64">
+      <div className="text-lg text-red-600">Error ao carregar lista de OS: {error?.message}</div>
+    </div>
+  )
 
-  if (!isLoading && error) {
-    return (
-      <div className="flex justify-center items-center min-h-64">
-        <div className="text-lg text-red-600">Error ao carregar lista de OS: {error?.message}</div>
-      </div>
-    )
-  }
 
-  const serviceOrdersView = serviceOrders.length === 0 ? (
+  const serviceOrdersView = serviceOrders?.length === 0 ? (
     <Card>
       <CardContent className="flex justify-center items-center py-12">
         <div className="text-center">
@@ -115,7 +120,7 @@ export function ServiceOrderList() {
       </CardContent>
     </Card>
   ) : (
-    serviceOrders.map((order) => (
+    serviceOrders?.map((order) => (
       <Card key={order.id} className="hover:shadow-md transition-shadow">
         <CardContent className="p-6">
           <div className="flex justify-between items-start mb-4">
@@ -181,6 +186,16 @@ export function ServiceOrderList() {
       </Card>
     ))
   )
+
+  const { page } = filters
+  const totalPages = Math.ceil(totalCount / filters.limit)
+
+  const changePage = (incrementToPage: number) => () => {
+    setFilters((prevFilters) => ({
+      ...prevFilters,
+      page: prevFilters.page + incrementToPage,
+    }));
+  }
 
   return (
     <div className="space-y-6">
@@ -250,9 +265,45 @@ export function ServiceOrderList() {
         </CardContent>
       </Card>
 
+
       {/* Service Orders List */}
       <div className="grid gap-4">
+        {errorView}
+
         {isLoading ? loadingView : serviceOrdersView}
+
+
+        <div className="flex items-center justify-between mt-4 pt-4 border-t">
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={changePage(-1)}
+            disabled={page === 1}
+            className="gap-1"
+          >
+            <ChevronLeft className="h-3 w-3" />
+            Anterior
+
+          </Button>
+
+          <span className="text-sm text-muted-foreground">
+            Pag. {page} de {totalPages}. (Total: {totalCount} items)
+          </span>
+
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={changePage(1)}
+            disabled={page === totalPages}
+            className="gap-1"
+          >
+            Próxima
+            <ChevronRight className="h-3 w-3" />
+
+          </Button>
+
+
+        </div>
       </div>
     </div>
   )
