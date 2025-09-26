@@ -30,7 +30,7 @@ export function ServiceOrderForm({ serviceOrder, onSave, onCancel }: ServiceOrde
   const updateMutation = useUpdateServiceOrder()
 
   const isEditing = !!serviceOrder
-  
+
   useEffect(() => {
     if (serviceOrder) {
       setName(serviceOrder.name)
@@ -75,16 +75,16 @@ export function ServiceOrderForm({ serviceOrder, onSave, onCancel }: ServiceOrde
           id: serviceOrder.id,
           input: serviceOrderData,
         })
-        toast({ 
-          title: `OS (#${serviceOrder?.id}) atualizada com Sucesso!`, 
-        })  
+        toast({
+          title: `OS (#${serviceOrder?.id}) atualizada com Sucesso!`,
+        })
       } else {
         const newServiceOrder = await createMutation.mutateAsync(serviceOrderData)
 
-        toast({ 
-          title: `OS (#${newServiceOrder?.id}) criada com Sucesso!`, 
-          description: "Agora pode gerenciá-la na pagina de Listas de OS." 
-        })  
+        toast({
+          title: `OS (#${newServiceOrder?.id}) criada com Sucesso!`,
+          description: "Agora pode gerenciá-la na pagina de Listas de OS."
+        })
       }
 
       onSave?.()
@@ -104,6 +104,10 @@ export function ServiceOrderForm({ serviceOrder, onSave, onCancel }: ServiceOrde
       setPhone(serviceOrder?.phone || "")
       setDescription(serviceOrder?.description || "")
       setServices(serviceOrder.services || JSON.parse(serviceOrder.services_list || "") || [{ description: "", price: 0 }])
+      toast({
+        title: `Alterações descartadas!`,
+        description: "Nenhuma alteração foi salva. Você pode retomar a página de lista de OS.",
+      })
     } else {
       setName("")
       setPhone("")
@@ -111,7 +115,7 @@ export function ServiceOrderForm({ serviceOrder, onSave, onCancel }: ServiceOrde
       setServices([{ description: "", price: 0 }])
     }
 
-    
+
     onCancel?.()
   }
 
@@ -129,7 +133,7 @@ export function ServiceOrderForm({ serviceOrder, onSave, onCancel }: ServiceOrde
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="name">Name</Label>
+              <Label htmlFor="name">Nome</Label>
               <Input
                 id="name"
                 value={name}
@@ -139,10 +143,10 @@ export function ServiceOrderForm({ serviceOrder, onSave, onCancel }: ServiceOrde
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="phone">Phone</Label>
+              <Label htmlFor="phone">Celular</Label>
               <Input
                 id="phone"
-                type="tel"
+                type="number"
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
                 required
@@ -152,7 +156,7 @@ export function ServiceOrderForm({ serviceOrder, onSave, onCancel }: ServiceOrde
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="description">Description</Label>
+            <Label htmlFor="description">Descrição</Label>
             <Textarea
               id="description"
               value={description}
@@ -164,7 +168,7 @@ export function ServiceOrderForm({ serviceOrder, onSave, onCancel }: ServiceOrde
 
           <div className="space-y-4">
             <div className="flex items-center justify-between">
-              <Label className="text-lg font-semibold">Services</Label>
+              <Label className="text-lg font-semibold">Serviços</Label>
               <Button
                 type="button"
                 onClick={addService}
@@ -173,24 +177,24 @@ export function ServiceOrderForm({ serviceOrder, onSave, onCancel }: ServiceOrde
                 className="border-blue-500 text-blue-600 hover:bg-blue-50 bg-transparent"
               >
                 <Plus className="h-4 w-4 mr-1" />
-                Add Service
+                Adicionar Serviço
               </Button>
             </div>
 
             {services.map((service, index) => (
               <div key={index} className="flex gap-2 items-end">
                 <div className="flex-1 space-y-2">
-                  <Label htmlFor={`service-desc-${index}`}>Description</Label>
+                  <Label htmlFor={`service-desc-${index}`}>Descrição</Label>
                   <Input
                     id={`service-desc-${index}`}
                     value={service.description}
                     onChange={(e) => updateService(index, "description", e.target.value)}
-                    placeholder="Service description"
+                    placeholder="Descrição do serviço"
                     className="border-slate-300 focus:border-blue-500"
                   />
                 </div>
                 <div className="w-32 space-y-2">
-                  <Label htmlFor={`service-price-${index}`}>Price</Label>
+                  <Label htmlFor={`service-price-${index}`}>Preço</Label>
                   <Input
                     id={`service-price-${index}`}
                     type="number"
@@ -219,14 +223,14 @@ export function ServiceOrderForm({ serviceOrder, onSave, onCancel }: ServiceOrde
 
           <div className="bg-slate-50 p-4 rounded-lg">
             <div className="flex justify-between items-center">
-              <span className="text-lg font-semibold text-slate-700">Total Amount:</span>
+              <span className="text-lg font-semibold text-slate-700">Valor Total:</span>
               <span className="text-2xl font-bold text-blue-600">${totalAmount.toFixed(2)}</span>
             </div>
           </div>
 
           <div className="flex gap-4 pt-4">
             <Button type="submit" disabled={isLoading} className="flex-1 bg-blue-600 hover:bg-blue-700 text-white">
-              {isLoading ? "Saving..." : isEditing ? "Update" : "Save"}
+              {isLoading ? "Salvando..." : isEditing ? "Atualizar" : "Salvar"}
             </Button>
             <Button
               type="button"
@@ -234,7 +238,7 @@ export function ServiceOrderForm({ serviceOrder, onSave, onCancel }: ServiceOrde
               variant="outline"
               className="flex-1 border-slate-300 text-slate-700 hover:bg-slate-50 bg-transparent"
             >
-              Cancel
+              Cancelar
             </Button>
           </div>
         </form>

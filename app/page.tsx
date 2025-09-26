@@ -2,6 +2,7 @@
 
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Skeleton } from "@/components/ui/skeleton"
 import { useServiceOrders } from "@/hooks/use-service-orders"
 import { ServiceOrderStatus } from "@/lib/graphql-client"
 import Link from "next/link"
@@ -25,11 +26,15 @@ export default function HomePage() {
   const { totalAmount = 0, totalCount = 0 } = data || {}
 
   const errorView = error && (
-    <div className="text-red-500">Erro ao carregar estatísticas: {error.message}</div>)
-
-  const loadingView = isLoading && (
-    <div className="text-gray-500">Carregando Informações...</div>
+    <div className="text-red-500 text-center w-full mt-4"><span>Erro ao carregar estatísticas: {error.message}</span></div>
   )
+  
+  const loadingView = isLoading && (
+    <div className="text-gray-500 text-center w-full mt-4"><span>Carregando Informações...</span></div>
+  )
+  const loadingSkeleton = (el: React.ReactNode) => isLoading ? (
+    <Skeleton className="h-6 w-12" />
+  ) : el
 
 
   return (
@@ -76,20 +81,20 @@ export default function HomePage() {
               </div>
               <div className="flex justify-between">
                 <span className="text-sm text-muted-foreground">Total:</span>
-                <span className="font-medium">{totalCount}</span>
+                {loadingSkeleton(<span className="font-medium">{totalCount}</span>)}
               </div>
               <div className="flex justify-between">
                 <span className="text-sm text-muted-foreground">Total Recebido:</span>
-                <span className="font-medium">{normalizeCurrencyBRL(totalAmount ?? 0)}</span>
-              </div> 
+                {loadingSkeleton(<span className="font-medium">{normalizeCurrencyBRL(totalAmount ?? 0)}</span>)}
+              </div>
             </div>
           </CardContent>
         </Card>
 
-        {loadingView}
-
-        {errorView}
       </div>
+      {loadingView}
+
+      {errorView}
     </div>
   )
 }

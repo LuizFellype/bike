@@ -1,13 +1,11 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import {
   apolloClient,
-  GET_SERVICE_ORDERS,
   GET_SERVICE_ORDER_BY_WHERE,
   CREATE_SERVICE_ORDER,
   UPDATE_SERVICE_ORDER,
   DELETE_SERVICE_ORDER,
   ServiceOrderStatus,
-  GET_DASHBOARD_SERVICE_ORDERS,
   queryList,
   queryDashboard,
 } from "@/lib/graphql-client"
@@ -24,12 +22,7 @@ import { normalizeServicesOrder } from "@/lib/data-normalizations"
 const normalizeReading = normalizeServicesOrder(false)
 const normalizeWriting = normalizeServicesOrder(true)
 
-type ServiceOrdersPaginationResult = {
-  serviceOrders: ServiceOrder[]
-  totalCount: number
-}
-// Hook for fetching all service orders with optional filtering
-export function useServiceOrders(filterParams: ServiceOrderFilter, isDashboard = false) {
+const normalizeFilters = (filterParams: ServiceOrderFilter) => {
   const limit = filterParams.limit
   const offset = !!limit ? (filterParams.page ? (filterParams.page - 1) * limit : 0) : 0
 
@@ -42,13 +35,24 @@ export function useServiceOrders(filterParams: ServiceOrderFilter, isDashboard =
 
   const filterKey = { ...filter, limit, offset }
 
+  return { filterKey, filter, limit, offset }
+}
+
+type ServiceOrdersPaginationResult = {
+  serviceOrders: ServiceOrder[]
+  totalCount: number
+}
+// Hook for fetching all service orders with optional filtering
+export function useServiceOrders(filterParams: ServiceOrderFilter, isDashboard = false) {
+  const { filterKey, filter, limit, offset } = normalizeFilters(filterParams)
+
   const queryFnBuilder = (query: QueryOptions<OperationVariables, any>, handleResult: (arg0: ApolloQueryResult<any>) => any) => async () => {
     const result = await apolloClient.query(query)
 
     return handleResult(result)
   }
 
-  const { query, handleResult } = isDashboard ? queryDashboard({ whereInput: filter }) : queryList({ whereInput: filter, limit, offset }) 
+  const { query, handleResult } = isDashboard ? queryDashboard({ whereInput: filter }) : queryList({ whereInput: filter, limit, offset })
 
   return useQuery({
     queryKey: ["serviceOrders", filterKey],
@@ -78,7 +82,7 @@ export function useServiceOrder(params: WhereParams) {
     let filteredByKey;
     allQueries.find((queryInfo) => {
       const fetchedQuery = queryInfo?.[1] as unknown as ServiceOrdersPaginationResult
-      
+
       filteredByKey = fetchedQuery?.serviceOrders?.find(so => so[params.key] === Number(params.value))
 
       return !!filteredByKey
@@ -159,7 +163,7 @@ export function useUpdateServiceOrder() {
 }
 
 // Hook for deleting a service order
-export function useDeleteServiceOrder(filter?: ServiceOrderFilter) {
+export function useDeleteServiceOrder(filterParams: ServiceOrderFilter) {
   const queryClient = useQueryClient()
 
   return useMutation({
@@ -173,11 +177,14 @@ export function useDeleteServiceOrder(filter?: ServiceOrderFilter) {
       return result.data.deleteServiceOrder
     },
     onSuccess: (_, variables) => {
-      queryClient.setQueryData(['serviceOrders', filter], (oldData?: ServiceOrder[]) => {
-        const newData = oldData ? oldData.filter(item => item.id !== variables) : []
+      const { filterKey } = normalizeFilters(filterParams)
 
-        return newData;
+      queryClient.setQueryData(['serviceOrders', filterKey], (oldData?: { serviceOrders: ServiceOrder[]; totalCount: number }) => {
+        const updatedServiceOrders = oldData ? oldData.serviceOrders.filter(item => item.id !== variables) : []
+
+        return { serviceOrders: updatedServiceOrders, totalCount: updatedServiceOrders.length };
       });
+      
     },
   })
 }

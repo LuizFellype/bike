@@ -10,21 +10,21 @@ export function Header() {
       <div className="container mx-auto px-4 py-4 flex items-center justify-between">
         <Link href="/" className="hover:opacity-80 transition-opacity">
           <h1 className="text-2xl font-bold text-foreground font-[family-name:var(--font-space-grotesk)]">
-            Service Order Management
+            Gerenciamento de Ordem de Serviços
           </h1>
         </Link>
 
-        <nav className="flex items-center gap-4">
+        <nav className="flex items-center gap-4 flex-wrap">
           <Link href="/service-orders/create">
             <Button variant="default" size="sm">
               <Plus className="h-4 w-4 mr-2" />
-              Create SO
+              Criar OS
             </Button>
           </Link>
           <Link href="/service-orders">
             <Button variant="outline" size="sm">
               <List className="h-4 w-4 mr-2" />
-              View All
+              Gerenciar
             </Button>
           </Link>
         </nav>

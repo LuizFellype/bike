@@ -9,8 +9,8 @@ import { Header } from "@/components/layout/header"
 import { Toaster } from "@/components/ui/toaster"
 
 export const metadata: Metadata = {
-  title: "Service Order Management",
-  description: "Manage your service orders efficiently",
+  title: "Gerenciamento de Ordem de Serviços",
+  description: "Gerencie suas ordens de serviço de forma eficiente e organizada.",
   generator: "v0.app",
 }
 

@@ -51,7 +51,7 @@ export function StatusFilter({ selectedStatuses, onStatusChange, className }: St
         </div>
 
         {/* Status toggle buttons */}
-        <div className="flex gap-1">
+        <div className="flex gap-1 flex-wrap">
           {(Object.keys(statusConfig) as ServiceOrderStatus[]).map((status) => {
             const isSelected = selectedStatuses.includes(status)
             return (
@@ -68,7 +68,6 @@ export function StatusFilter({ selectedStatuses, onStatusChange, className }: St
                   isSelected && "border-current shadow-sm",
                 )}
               >
-                <div className={cn("w-2 h-2 rounded-full mr-2", statusConfig[status].color.split(" ")[0])} />
                 {statusConfig[status].label}
               </Button>
             )
@@ -122,7 +121,7 @@ export const StatusToggleController = ({ onMoveTask, task, children }: StatusTog
   const previousStatus = getPreviousStatus(status)
   const nextStatus = getNextStatus(status)
 
-  return <div className="flex gap-2 relative">
+  return <div className="flex gap-2 relative flex-wrap">
     {previousStatus && (
       <Button
         size="sm"
