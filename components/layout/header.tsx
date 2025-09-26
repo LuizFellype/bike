@@ -3,8 +3,16 @@
 import { Button } from "@/components/ui/button"
 import { Plus, List } from "lucide-react"
 import Link from "next/link"
+import { usePathname } from 'next/navigation';
+
 
 export function Header() {
+  const pathname = usePathname();
+  const isViewPage = pathname.includes('/view');
+  if (isViewPage) {
+    return null
+  }
+  
   return (
     <header className="border-b bg-card">
       <div className="container mx-auto px-4 py-4 flex items-center justify-between">

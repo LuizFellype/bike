@@ -31,7 +31,6 @@ export interface Service {
   }
 
   const createServiceOrder = async (order: Omit<ServiceOrder, "id" | "created_at" | "updated_at">): Promise<ServiceOrder> => {
-    console.log('order', order)
       // TODO: Replace with actual API call to database
     const newOrder = { ...order, id: crypto.randomUUID() }
     const orders = await getServiceOrders()

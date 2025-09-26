@@ -106,6 +106,7 @@ export function useServiceOrder(params: WhereParams) {
       return normalizeReading(result.data.serviceOrders[0]) as ServiceOrder
     },
     enabled: !!params.value,
+    retry: false,
     ...initial
   })
 }

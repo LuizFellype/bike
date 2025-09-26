@@ -6,13 +6,15 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Search, Edit, Eye, Trash2, ChevronLeft, ChevronRight } from "lucide-react"
+import { Search, Edit, Eye, Trash2, ChevronLeft, ChevronRight, Share } from "lucide-react"
 import { useServiceOrders, useDeleteServiceOrder, useUpdateServiceOrder } from "@/hooks/use-service-orders"
 import { ServiceOrder, ServiceOrderStatus, ServiceOrderStatusLabel, type ServiceOrderFilter } from "@/lib/graphql-client"
 import Link from "next/link"
 import { statusConfig, StatusFilter, StatusToggleController } from "../ui/status-filter"
 import { toast } from "@/hooks/use-toast"
 import { SkeletonSOCard } from "../ui/skeleton"
+import copy from 'clipboard-copy';
+
 
 const getDaysFromNow = (daysDiff: number) => {
   const today = new Date()
@@ -67,9 +69,11 @@ export function ServiceOrderList() {
     setDateFrom("")
     setDateTo("")
 
-    setFilters({...DEFAULT_PAGINATION,
-    status: [ServiceOrderStatus.WAITING, ServiceOrderStatus.WIP]})
-    
+    setFilters({
+      ...DEFAULT_PAGINATION,
+      status: [ServiceOrderStatus.WAITING, ServiceOrderStatus.WIP]
+    })
+
   }
 
   const handleStatusToggle = async (id: ServiceOrder['id'], updatedStatus: ServiceOrder['status']) => {
@@ -101,6 +105,31 @@ export function ServiceOrderList() {
     }
   }
 
+  const handleShare = (id: string) => async () => {
+    const shareUrl = `${window.location.origin}/service-orders/view/${id}`
+     try {
+      await navigator.share({
+        title: `Ordem de Serviço: ${id}`,
+        text: 'Detalhes de sua Ordem de Serviço na Oficina de Bicicletas :)',
+        url: shareUrl
+      })
+    } catch (error) {
+      copy(shareUrl)
+      toast({
+        variant: 'success',
+        title: 'SUCESSO!',
+        description: 'Link compartilhável da OS copiado com sucesso.'
+      })
+    }
+
+    navigator.clipboard.writeText(shareUrl).then(() => {
+      toast({
+        title: "Link copiado para área de transferência!",
+        description: shareUrl,
+      })
+    })
+
+  }
 
   const errorView = !isLoading && error && (
     <div className="flex justify-center items-center min-h-64">
@@ -180,6 +209,16 @@ export function ServiceOrderList() {
             >
               <Trash2 className="h-4 w-4 mr-1" />
               Deletar
+            </Button>
+
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleShare(order.id)}
+              disabled={deleteMutation.isPending}
+              className="border-accent text-accent hover:bg-accent"
+            >
+              <Share className="h-4 w-4 mr-1" />
             </Button>
           </div>
         </CardContent>
@@ -268,7 +307,7 @@ export function ServiceOrderList() {
 
       {/* Service Orders List */}
       {errorView}
-      
+
       {emptyView}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {isLoading ? <><SkeletonSOCard /><SkeletonSOCard /></> : serviceOrdersView}

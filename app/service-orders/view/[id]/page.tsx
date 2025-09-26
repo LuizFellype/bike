@@ -20,23 +20,19 @@ export default function EditServiceOrderPage() {
 
   const { data: serviceOrder, isLoading: loading, error } = useServiceOrder(queryParams as WhereParams)
 
-  useEffect(() => {
-    if (!loading && !error && !serviceOrder) {
-      router.push("/service-orders/create")
-    }
-  }, [serviceOrder, loading])
-
+  const notFoundMessage = !loading && !serviceOrder ? <p className="text-destructive text-center mt-6">"Ordem de serviço (#{id}) não encontrada"</p> : null
+  
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background mt-4">
       <div className="flex justify-center">
         <h1 className="align-center text-2xl font-bold text-foreground font-[family-name:var(--font-space-grotesk)]">
-          Editar Ordem de Serviço
+          Vizualizar Ordem de Serviço
         </h1>
       </div>
-
+      {notFoundMessage}
       <main className="container mx-auto px-4 py-8">
         <div className="max-w-4xl mx-auto">
-          <ServiceOrderForm serviceOrder={serviceOrder as ServiceOrder} />
+          {!error && <ServiceOrderForm serviceOrder={serviceOrder as ServiceOrder} disabled />}
         </div>
       </main>
     </div>

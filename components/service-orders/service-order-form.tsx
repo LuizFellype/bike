@@ -17,10 +17,21 @@ interface ServiceOrderFormProps {
   serviceOrder?: ServiceOrder
   onSave?: () => void
   onCancel?: () => void
+  disabled?: boolean
 }
 
-export function ServiceOrderForm({ serviceOrder, onSave, onCancel }: ServiceOrderFormProps) {
-  const todayDate = new Date().toISOString().split("T")[0]
+// get date in DD/MM format
+
+const getFormattedDate = (dateString: string) => {
+  const date = new Date(dateString)
+  const day = String(date.getDate()).padStart(2, "0")
+  const month = String(date.getMonth() + 1).padStart(2, "0")
+  return `${day}/${month}`
+}
+
+export function ServiceOrderForm({ serviceOrder, onSave, onCancel, disabled }: ServiceOrderFormProps) {
+  const todayDate = getFormattedDate(new Date().toISOString())
+  
   const [name, setName] = useState("")
   const [phone, setPhone] = useState("")
   const [description, setDescription] = useState("")
@@ -76,6 +87,7 @@ export function ServiceOrderForm({ serviceOrder, onSave, onCancel }: ServiceOrde
           input: serviceOrderData,
         })
         toast({
+          variant: "success",
           title: `OS (#${serviceOrder?.id}) atualizada com Sucesso!`,
         })
       } else {
@@ -125,7 +137,7 @@ export function ServiceOrderForm({ serviceOrder, onSave, onCancel }: ServiceOrde
     <Card className="w-full max-w-2xl mx-auto flex flex-col">
       <CardHeader className="flex-row items-center flex-1 justify-between">
         <CardTitle className="text-2xl font-bold text-slate-900">
-          {isEditing ? "Edit Service Order" : "Create Service Order"}
+          {isEditing ? "Editar OS" : "Criar Ordem de Serviço"}
         </CardTitle>
         <span>{todayDate}</span>
       </CardHeader>
@@ -135,6 +147,7 @@ export function ServiceOrderForm({ serviceOrder, onSave, onCancel }: ServiceOrde
             <div className="space-y-2">
               <Label htmlFor="name">Nome</Label>
               <Input
+                disabled={disabled}
                 id="name"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
@@ -145,6 +158,7 @@ export function ServiceOrderForm({ serviceOrder, onSave, onCancel }: ServiceOrde
             <div className="space-y-2">
               <Label htmlFor="phone">Celular</Label>
               <Input
+                disabled={disabled}
                 id="phone"
                 type="number"
                 value={phone}
@@ -158,6 +172,7 @@ export function ServiceOrderForm({ serviceOrder, onSave, onCancel }: ServiceOrde
           <div className="space-y-2">
             <Label htmlFor="description">Descrição</Label>
             <Textarea
+              disabled={disabled}
               id="description"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
@@ -170,6 +185,7 @@ export function ServiceOrderForm({ serviceOrder, onSave, onCancel }: ServiceOrde
             <div className="flex items-center justify-between">
               <Label className="text-lg font-semibold">Serviços</Label>
               <Button
+                disabled={disabled}
                 type="button"
                 onClick={addService}
                 variant="outline"
@@ -186,6 +202,7 @@ export function ServiceOrderForm({ serviceOrder, onSave, onCancel }: ServiceOrde
                 <div className="flex-1 space-y-2">
                   <Label htmlFor={`service-desc-${index}`}>Descrição</Label>
                   <Input
+                    disabled={disabled}
                     id={`service-desc-${index}`}
                     value={service.description}
                     onChange={(e) => updateService(index, "description", e.target.value)}
@@ -196,6 +213,7 @@ export function ServiceOrderForm({ serviceOrder, onSave, onCancel }: ServiceOrde
                 <div className="w-32 space-y-2">
                   <Label htmlFor={`service-price-${index}`}>Preço</Label>
                   <Input
+                    disabled={disabled}
                     id={`service-price-${index}`}
                     type="number"
                     step="0.01"
@@ -208,6 +226,7 @@ export function ServiceOrderForm({ serviceOrder, onSave, onCancel }: ServiceOrde
                 </div>
                 {services.length > 1 && (
                   <Button
+                    disabled={disabled}
                     type="button"
                     onClick={() => removeService(index)}
                     variant="outline"
@@ -229,10 +248,11 @@ export function ServiceOrderForm({ serviceOrder, onSave, onCancel }: ServiceOrde
           </div>
 
           <div className="flex gap-4 pt-4">
-            <Button type="submit" disabled={isLoading} className="flex-1 bg-blue-600 hover:bg-blue-700 text-white">
+            <Button type="submit" disabled={isLoading || disabled} className="flex-1 bg-blue-600 hover:bg-blue-700 text-white">
               {isLoading ? "Salvando..." : isEditing ? "Atualizar" : "Salvar"}
             </Button>
             <Button
+              disabled={disabled}
               type="button"
               onClick={handleCancel}
               variant="outline"

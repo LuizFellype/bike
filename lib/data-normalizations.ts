@@ -1,6 +1,7 @@
 import { ServiceOrder } from "./graphql-client"
 
 export const normalizeServicesOrder = (isWriting = false) => (serviceOrder: ServiceOrder): ServiceOrder => {
+  if (!serviceOrder) return null as unknown as ServiceOrder
   if (isWriting) {
     const { services, ...so } = serviceOrder
     return { ...so, services_list: JSON.stringify(services || []) }
