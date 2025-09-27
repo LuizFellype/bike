@@ -297,7 +297,7 @@ export function ServiceOrderList() {
               </Button>
               <Button onClick={handleSearch} className="bg-blue-600 hover:bg-blue-700">
                 <Search className="h-4 w-4 mr-2" />
-                Search
+                Buscar
               </Button>
             </div>
           </div>
