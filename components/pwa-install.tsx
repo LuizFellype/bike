@@ -38,7 +38,7 @@ const PWAInstallPrompt = () => {
     return (
         <div className="flex justify-center">
             {hideInstallButton ? null : (
-                <div className="flex items-center gap-2 p-4 border border-success/40 rounded shadow-md mt-4" >
+                <div className="flex items-center gap-2 p-4 border border-success/40 rounded shadow-md mt-4 mb-4" >
                     <h2 className="text-xl font-bold text-success">
                         Instale o aplicativo no seu dispositivo:
                     </h2>

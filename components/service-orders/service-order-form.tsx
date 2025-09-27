@@ -12,12 +12,15 @@ import { Plus, Trash2 } from "lucide-react"
 import { useCreateServiceOrder, useUpdateServiceOrder } from "@/hooks/use-service-orders"
 import type { ServiceOrder, ServiceOrderService } from "@/lib/graphql-client"
 import { toast } from "@/hooks/use-toast"
+import { statusConfig } from "../ui/status-filter"
+import { Badge } from "../ui/badge"
 
 interface ServiceOrderFormProps {
   serviceOrder?: ServiceOrder
   onSave?: () => void
   onCancel?: () => void
   disabled?: boolean
+  isEditingMode?: boolean
 }
 
 // get date in DD/MM format
@@ -29,9 +32,9 @@ const getFormattedDate = (dateString: string) => {
   return `${day}/${month}`
 }
 
-export function ServiceOrderForm({ serviceOrder, onSave, onCancel, disabled }: ServiceOrderFormProps) {
+export function ServiceOrderForm({ serviceOrder, onSave, onCancel, disabled, isEditingMode }: ServiceOrderFormProps) {
   const todayDate = getFormattedDate(new Date().toISOString())
-  
+
   const [name, setName] = useState("")
   const [phone, setPhone] = useState("")
   const [description, setDescription] = useState("")
@@ -40,7 +43,7 @@ export function ServiceOrderForm({ serviceOrder, onSave, onCancel, disabled }: S
   const createMutation = useCreateServiceOrder()
   const updateMutation = useUpdateServiceOrder()
 
-  const isEditing = !!serviceOrder
+  const isEditing = isEditingMode ?? !!serviceOrder
 
   useEffect(() => {
     if (serviceOrder) {
@@ -94,6 +97,7 @@ export function ServiceOrderForm({ serviceOrder, onSave, onCancel, disabled }: S
         const newServiceOrder = await createMutation.mutateAsync(serviceOrderData)
 
         toast({
+          variant: "success",
           title: `OS (#${newServiceOrder?.id}) criada com Sucesso!`,
           description: "Agora pode gerenciá-la na pagina de Listas de OS."
         })
@@ -115,7 +119,7 @@ export function ServiceOrderForm({ serviceOrder, onSave, onCancel, disabled }: S
       setName(serviceOrder?.name || "")
       setPhone(serviceOrder?.phone || "")
       setDescription(serviceOrder?.description || "")
-      setServices(serviceOrder.services || JSON.parse(serviceOrder.services_list || "") || [{ description: "", price: 0 }])
+      setServices(serviceOrder?.services || JSON.parse(serviceOrder?.services_list || "") || [{ description: "", price: 0 }])
       toast({
         title: `Alterações descartadas!`,
         description: "Nenhuma alteração foi salva. Você pode retomar a página de lista de OS.",
@@ -127,7 +131,6 @@ export function ServiceOrderForm({ serviceOrder, onSave, onCancel, disabled }: S
       setServices([{ description: "", price: 0 }])
     }
 
-
     onCancel?.()
   }
 
@@ -137,8 +140,15 @@ export function ServiceOrderForm({ serviceOrder, onSave, onCancel, disabled }: S
     <Card className="w-full max-w-2xl mx-auto flex flex-col">
       <CardHeader className="flex-row items-center flex-1 justify-between">
         <CardTitle className="text-2xl font-bold text-slate-900">
-          {isEditing ? "Editar OS" : "Criar Ordem de Serviço"}
+          {disabled ? `OS #${serviceOrder?.id}` : (isEditing ? "Editar OS" : "Criar Ordem de Serviço")}
         </CardTitle>
+
+        {(isEditing && !!serviceOrder) && (
+          <Badge variant="secondary" className={`${statusConfig[serviceOrder.status].color}`} aria-selected>
+            {statusConfig[serviceOrder.status || ""].label}
+          </Badge>
+        )}
+
         <span>{todayDate}</span>
       </CardHeader>
       <CardContent>

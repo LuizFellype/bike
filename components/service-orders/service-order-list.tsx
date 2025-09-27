@@ -193,7 +193,7 @@ export function ServiceOrderList() {
             </div>
           )}
 
-          <div className="flex gap-2">
+        <div className="flex gap-2 flex-wrap">
             <Link href={`/service-orders/edit/${order.id}`}>
               <Button variant="outline" size="sm">
                 <Edit className="h-4 w-4 mr-1" />
