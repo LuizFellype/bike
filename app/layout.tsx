@@ -11,7 +11,7 @@ import PWAInstallPrompt from "@/components/pwa-install"
 
 
 const APP_NAME = 'Magno Sport Bike - Gerenciar OS';
-const APP_DEFAULT_TITLE = "Gerenciamento de Ordem de Serviços";
+const APP_DEFAULT_TITLE = "Magno Sport Bike";
 const APP_TITLE_TEMPLATE = "%s - Bask Santa";
 
 
@@ -38,12 +38,12 @@ export const metadata: Metadata = {
     type: "website",
     siteName: APP_DEFAULT_TITLE,
     title: APP_DEFAULT_TITLE,
-    description: "A comprehensive starter kit with PWA capabilities",
+    description: "Sistema para gerenciar Ordem de Serviços",
   },
   twitter: {
     card: "summary",
     title: APP_DEFAULT_TITLE,
-    description: "A comprehensive starter kit with PWA capabilities",
+    description: "Sistema para gerenciar Ordem de Serviços",
   },
   icons: [
     {

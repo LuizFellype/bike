@@ -105,30 +105,30 @@ export function ServiceOrderList() {
     }
   }
 
-  const handleShare = (id: string) => async () => {
-    const shareUrl = `${window.location.origin}/service-orders/view/${id}`
-     try {
-      await navigator.share({
-        title: `Ordem de Serviço: ${id}`,
-        text: 'Detalhes de sua Ordem de Serviço na Oficina de Bicicletas :)',
-        url: shareUrl
-      })
-    } catch (error) {
-      copy(shareUrl)
-      toast({
-        variant: 'success',
-        title: 'SUCESSO!',
-        description: 'Link compartilhável da OS copiado com sucesso.'
-      })
+  const handleShare = (os: ServiceOrder) => async () => {
+    const shareUrl = `${window.location.origin}/service-orders/view/${os.id}`
+
+    try {
+      window.open(`https://wa.me/${os.phone}?text=Acompanhe o status de sua Ordem de Serviço na Oficina do Magno.%0AFoi um prazer te atender! :)%0A${shareUrl}`, '_blank')
+
+    } catch {
+      try {
+        await navigator.share({
+          title: `Ordem de Serviço: ${os.id} - Magno Sport Bike`,
+          text: `Acompanhe o status de sua Ordem de Serviço na Oficina do Magno. Foi um prazer te atender! \n ${shareUrl}`,
+          url: shareUrl
+        })
+
+      } catch {
+        copy(`Acompanhe o status de sua Ordem de Serviço na Oficina do Magno. Foi um prazer te atender! \n ${shareUrl}`)
+
+        toast({
+          variant: 'success',
+          title: 'SUCESSO!',
+          description: 'Link compartilhável da OS copiado com sucesso.'
+        })
+      }
     }
-
-    navigator.clipboard.writeText(shareUrl).then(() => {
-      toast({
-        title: "Link copiado para área de transferência!",
-        description: shareUrl,
-      })
-    })
-
   }
 
   const errorView = !isLoading && error && (
@@ -193,7 +193,7 @@ export function ServiceOrderList() {
             </div>
           )}
 
-        <div className="flex gap-2 flex-wrap">
+          <div className="flex gap-2 flex-wrap">
             <Link href={`/service-orders/edit/${order.id}`}>
               <Button variant="outline" size="sm">
                 <Edit className="h-4 w-4 mr-1" />
@@ -214,7 +214,7 @@ export function ServiceOrderList() {
             <Button
               variant="outline"
               size="sm"
-              onClick={handleShare(order.id)}
+              onClick={handleShare(order)}
               disabled={deleteMutation.isPending}
               className="border-accent text-accent hover:bg-accent"
             >
