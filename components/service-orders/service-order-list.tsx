@@ -197,7 +197,7 @@ export function ServiceOrderList() {
             <Link href={`/service-orders/edit/${order.id}`}>
               <Button variant="outline" size="sm">
                 <Edit className="h-4 w-4 mr-1" />
-                Vizualizar/Editar
+                Editar
               </Button>
             </Link>
             <Button

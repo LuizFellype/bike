@@ -67,8 +67,9 @@ const SkeletonSOCard = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTM
 
           <SkeletonText size="xl" className="w-full" />
           <div className="flex items-center gap-2">
-            <SkeletonButton className="w-1/3" />
             <SkeletonButton />
+            <SkeletonButton />
+            <SkeletonButton className="w-1/7" />
           </div>
         </>
       )}
